@@ -1,0 +1,2208 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>テンパイ1000本ノック</title>
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap");
+
+/* ============ トークン ============ */
+:root{
+  /* 牌そのものから採った配色 */
+  --ivory:#FFFDF7; --ivory-2:#F2EDE0; --ivory-edge:#CFC7B2; --ivory-rim:#BCB29A;
+  --sumi:#1B1B18;  --sumi-2:#3D3B36;
+  --aka:#B1332C;   /* 萬子の赤・中 */
+  --ai:#1F4F8F;    /* 筒子の藍 */
+  --midori:#2C7A4B;/* 索子の緑・發 */
+  --midori-d:#1E5836;
+
+  --bg:#F5F3ED;
+  --surface:#FFFFFF;
+  --surface-2:#FAF8F2;
+  --line:#E4E0D5;
+  --line-2:#D4CFC1;
+  --ink:var(--sumi);
+  --sub:#6A665C;
+  --bar:#E9E5DB;
+  --bar-line:#D8D3C6;
+
+  --ok:var(--midori);
+  --ng:var(--aka);
+  --ok-fill:#1E5836; --ng-fill:#A82F28;
+  --ok-text:#1E5836; --ng-text:#A82F28;
+  --hint:var(--ai);
+
+  --mincho:"Shippori Mincho","Yu Mincho","Hiragino Mincho ProN","Noto Serif JP","Noto Sans CJK JP",serif;
+  --gothic:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Yu Gothic Medium","Yu Gothic",Meiryo,"BIZ UDPGothic","Noto Sans CJK JP",sans-serif;
+
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#17171A; --surface:#212126; --surface-2:#1B1B1F;
+    --line:#33333A; --line-2:#42424B;
+    --ink:#F2F0EA; --sub:#B0ABA2;
+    --bar:#3A3A42; --bar-line:#4A4A54;
+    --aka:#D9534C; --ai:#5A8FD0; --midori:#4FA974; --midori-d:#2C7A4B;
+    --ok-fill:#2C7A4B; --ng-fill:#B1332C;
+    --ok-text:#6FBF8F; --ng-text:#E0736C;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#17171A; --surface:#212126; --surface-2:#1B1B1F;
+  --line:#33333A; --line-2:#42424B;
+  --ink:#F2F0EA; --sub:#B0ABA2;
+  --bar:#3A3A42; --bar-line:#4A4A54;
+  --aka:#D9534C; --ai:#5A8FD0; --midori:#4FA974; --midori-d:#2C7A4B;
+    --ok-fill:#2C7A4B; --ng-fill:#B1332C;
+    --ok-text:#6FBF8F; --ng-text:#E0736C;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;padding:22px 16px 72px;
+  background:var(--bg);color:var(--ink);
+  font-family:var(--gothic);font-size:16.5px;line-height:1.8;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:800px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+
+/* ============ ヘッダ ============ */
+header{display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap}
+h1{
+  font-family:var(--mincho);font-size:27px;font-weight:600;letter-spacing:.12em;
+  margin:0;line-height:1.2;
+}
+h1 .sub{
+  display:block;font-family:var(--gothic);font-size:12px;font-weight:400;
+  letter-spacing:.16em;color:var(--sub);margin-top:5px;
+}
+.savebox{display:flex;align-items:center;gap:12px}
+.unsaved{font-size:13px;color:var(--sub);white-space:nowrap}
+.unsaved.pending{color:var(--aka);font-weight:600}
+.btn.save{padding:8px 18px;font-size:14.5px;border-radius:999px}
+.btn.dunno{border-color:var(--line-2);color:var(--sub);background:none}
+.btn.dunno:hover{border-color:var(--sub);color:var(--ink)}
+.btn.mark{border-color:var(--line-2);color:var(--sub)}
+.btn.mark:hover{border-color:var(--ai);color:var(--ai)}
+.btn.mark.on{background:var(--ai);border-color:var(--ai);color:#fff}
+
+/* ============ タブ ============ */
+#drill{display:flex;flex-direction:column;gap:18px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line)}
+.tab{
+  border:none;background:none;color:var(--sub);font-size:15px;
+  padding:9px 18px 10px;border-bottom:2px solid transparent;margin-bottom:-1px;
+}
+.tab:hover{color:var(--ink)}
+.tab.on{color:var(--ink);border-bottom-color:var(--ai);font-weight:500}
+.tab .n{font-size:12px;color:var(--sub);margin-left:6px;font-variant-numeric:tabular-nums}
+
+/* ============ 記録一覧 ============ */
+.empty{color:var(--sub);font-size:14.5px;text-align:center;padding:26px 0}
+.agg tr.link{cursor:pointer}
+.agg tr.link:hover td{background:var(--surface-2)}
+.agg tr.link.on td{background:var(--surface-2);border-bottom-color:var(--line-2)}
+.agg tr.expand td{background:var(--surface-2);padding:4px 10px 16px;border-bottom:1px solid var(--line-2)}
+.rec-head.flat{position:static;background:none}
+.rec{border-top:2px solid var(--line-2)}
+.rec.open{
+  background:var(--surface-2);
+  border-top:2px solid var(--sub);border-bottom:2px solid var(--sub);
+  margin:0 -6px;padding:0 6px;
+}
+.rec.open .rec-row{background:none}
+.rec-row{
+  display:flex;align-items:center;gap:12px;width:100%;
+  background:none;border:none;padding:9px 4px;text-align:left;color:var(--ink);
+}
+.rec-row:hover{background:var(--surface-2)}
+.rec-no{font-size:12px;color:var(--sub);font-variant-numeric:tabular-nums;width:56px;flex:none;line-height:1.4}
+.rec-no b{display:block;font-family:var(--mincho);font-size:15px;color:var(--ink);font-weight:600}
+.rec-hand{display:flex;gap:2px;flex-wrap:nowrap;overflow:hidden;flex:1;min-width:0}
+.rec-hand .tile{--w:clamp(13px,2.9vw,21px)}
+.rec-hand .drawn{margin-left:9px}
+.marks{display:flex;gap:4px;flex:none}
+.mk{
+  width:24px;height:24px;border-radius:50%;font-size:12px;line-height:24px;
+  text-align:center;border:1px solid var(--line-2);color:var(--sub);
+}
+.rec-head{
+  position:sticky;top:0;z-index:2;background:var(--surface);
+  display:flex;align-items:center;gap:12px;padding:7px 4px 6px;
+  border-bottom:1px solid var(--line-2);
+}
+.rec-head .sp{flex:1;font-size:11.5px;letter-spacing:.1em;color:var(--sub)}
+.mkhead{display:flex;gap:4px;flex:none}
+.mkh{width:24px;font-size:11px;line-height:1.3;text-align:center;color:var(--sub);letter-spacing:0}
+.rec-note{font-size:12px;color:var(--sub);padding:8px 4px 0}
+.mk.o{background:var(--ok-fill);border-color:var(--ok-fill);color:#fff}
+.mk.x{background:var(--ng-fill);border-color:var(--ng-fill);color:#fff}
+.mk.q{background:var(--bar);border-color:var(--line-2);color:var(--sub);font-weight:700}
+.rec-flag{width:20px;flex:none;text-align:center;color:var(--ai);font-size:15px}
+.rec-open{padding:2px 4px 18px}
+.rec-ans{display:flex;flex-direction:column;gap:7px;font-size:14px;margin-top:10px}
+.rec-ans .lab{font-size:11.5px;letter-spacing:.12em;color:var(--sub);width:46px;flex:none}
+.rec-ans .row{display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.rec-ans .tile{--w:clamp(18px,4vw,26px)}
+.rec-ans .ng{color:var(--ng-text)}
+.rec-ans .ok{color:var(--ok-text)}
+.rec-ans .dk{color:var(--sub)}
+.more{display:block;margin:14px auto 0}
+
+/* ============ 設定 ============ */
+.conf h2{
+  font-family:var(--gothic);font-size:11.5px;letter-spacing:.14em;color:var(--sub);
+  font-weight:500;margin:22px 0 8px;
+}
+.conf h2:first-child{margin-top:0}
+.conf-note{font-size:13px;color:var(--sub);line-height:1.8;margin:0 0 12px}
+.conf-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px}
+.conf-item{
+  display:flex;align-items:center;gap:10px;text-align:left;
+  border:1px solid var(--line);background:var(--surface-2);color:var(--sub);
+  border-radius:8px;padding:9px 13px;font-size:14.5px;
+}
+.conf-item:hover{border-color:var(--sub)}
+.conf-item.full{opacity:.45}
+.conf-warn{font-size:13px;color:var(--ng-text);margin:0 0 10px}
+.conf-item.on{border-color:var(--ai);background:color-mix(in srgb,var(--ai) 8%,var(--surface));color:var(--ink)}
+.ci-box{
+  width:20px;height:20px;flex:none;border:1px solid var(--line-2);border-radius:5px;
+  font-size:13px;line-height:19px;text-align:center;background:var(--surface);
+}
+.conf-item.on .ci-box{background:var(--ai);border-color:var(--ai);color:#fff}
+.conf-act{margin-top:14px}
+.conf-rate{display:flex;gap:8px;flex-wrap:wrap}
+.conf-rate .chip.on{border-color:var(--ai);background:color-mix(in srgb,var(--ai) 12%,var(--surface));font-weight:500}
+
+/* ============ 集計 ============ */
+.agg h2{
+  font-family:var(--gothic);font-size:11.5px;letter-spacing:.14em;color:var(--sub);
+  font-weight:500;margin:22px 0 8px;
+}
+.agg h2:first-child{margin-top:0}
+.agg table{width:100%;border-collapse:collapse;font-size:14px}
+.agg th,.agg td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}
+.agg th{font-size:11.5px;letter-spacing:.1em;color:var(--sub);font-weight:500;white-space:nowrap}
+.agg td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.agg td.p{width:38%;min-width:120px}
+.bar{display:flex;align-items:center;gap:9px}
+.bar-track{flex:1;height:7px;border-radius:4px;background:var(--line);overflow:hidden}
+.bar-fill{height:100%;background:var(--ai);border-radius:4px}
+.bar-val{font-variant-numeric:tabular-nums;font-size:13.5px;width:44px;text-align:right;flex:none}
+.agg .dim{color:var(--sub)}
+
+/* ============ 成績バー ============ */
+.stats{
+  display:flex;gap:0;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--r);overflow:hidden;
+}
+.stat{flex:1;padding:9px 12px 10px;border-left:1px solid var(--line);min-width:0}
+.stat:first-child{border-left:0}
+.stat .k{font-size:11.5px;letter-spacing:.1em;color:var(--sub);white-space:nowrap}
+.stat .v{font-family:var(--mincho);font-size:23px;font-variant-numeric:tabular-nums;line-height:1.3}
+.stat .v small{font-size:12px;color:var(--sub);font-family:var(--gothic);margin-left:2px}
+
+/* ============ 卓 ============ */
+.table{
+  background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  padding:16px 14px 18px;
+}
+.seats{
+  display:grid;grid-template-columns:48px 1fr 48px;grid-template-rows:34px 118px auto;
+  align-items:center;justify-items:center;gap:10px;
+}
+.bar{background:var(--bar);border:1px solid var(--bar-line);border-radius:3px;position:relative}
+.seat-top{grid-column:2;grid-row:1;width:52%;height:20px}
+.seat-left{grid-column:1;grid-row:2;width:20px;height:70%;transform:rotate(9deg)}
+.seat-right{grid-column:3;grid-row:2;width:20px;height:70%;transform:rotate(-9deg)}
+.oya{
+  position:absolute;font-size:15px;letter-spacing:.1em;color:var(--aka);
+  white-space:nowrap;font-weight:700;
+}
+.seat-top .oya{top:-25px;left:50%;transform:translateX(-50%)}
+.seat-left .oya{top:-25px;left:50%;transform:translateX(-50%) rotate(-9deg)}
+.seat-right .oya{top:-25px;left:50%;transform:translateX(-50%) rotate(9deg)}
+.center{grid-column:2;grid-row:2;display:flex;flex-direction:column;align-items:center;gap:2px}
+.ba{font-family:var(--mincho);font-size:25px;letter-spacing:.22em;color:var(--sub);font-weight:600}
+.ba-self{font-size:16px;letter-spacing:.08em;color:var(--aka);height:23px;font-weight:600}
+.mine{grid-column:1/-1;grid-row:3;display:flex;flex-direction:column;align-items:center;gap:7px;width:100%}
+.mine .oya-self{font-size:15px;letter-spacing:.1em;color:var(--aka);font-weight:700;height:20px}
+.hand{display:flex;gap:3px;justify-content:center;flex-wrap:nowrap}
+.hand .drawn{margin-left:13px}
+.table.inline{margin:12px 0 6px}
+.table.inline .seats{grid-template-rows:32px 92px auto;gap:8px}
+.table.inline .tile{--w:clamp(19px,4.2vw,32px)}
+.winhand{display:flex;gap:3px;flex-wrap:wrap;align-items:flex-end;margin:12px 0 4px}
+.winhand .tile{--w:clamp(20px,4.4vw,30px)}
+.winhand .drawn{margin-left:11px}
+
+/* ============ 牌 ============ */
+.tile{
+  --w:clamp(21px,5.3vw,40px); --h:calc(var(--w)*1.35);
+  position:relative;width:var(--w);height:var(--h);
+  border-radius:calc(var(--w)*0.13);
+  background:linear-gradient(170deg,var(--ivory) 0%,var(--ivory) 62%,var(--ivory-2) 100%);
+  border:1px solid var(--ivory-edge);
+  box-shadow:0 2px 0 var(--ivory-rim),0 3px 5px rgba(0,0,0,.14),inset 0 1px 0 rgba(255,255,255,.9);
+  display:flex;align-items:center;justify-content:center;flex:none;
+  user-select:none;transition:transform .12s ease, box-shadow .12s ease;
+}
+.tile.win{
+  box-shadow:0 2px 0 var(--ivory-rim),0 3px 5px rgba(0,0,0,.14),
+             inset 0 1px 0 rgba(255,255,255,.9),0 0 0 2px var(--ai);
+}
+.face{width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:calc(var(--w)*0.08)}
+.face > svg{width:100%;height:100%;display:block;overflow:visible}
+.man{flex-direction:column;justify-content:center;font-family:var(--mincho)}
+.man .num{font-size:calc(var(--w)*0.52);line-height:1;color:#1B1B1B;font-weight:600}
+.man .wan{font-size:calc(var(--w)*0.42);line-height:1.15;color:#B1332C;font-weight:600}
+.honor{font-family:var(--mincho);font-size:calc(var(--w)*0.60);font-weight:600;line-height:1}
+.honor.kaze{color:#1B1B1B}
+.honor.hatsu{color:#1F7A4D}
+.honor.chun{color:#B1332C}
+.haku{width:62%;height:70%;border:calc(var(--w)*0.05) solid #2F5F9E;border-radius:2px;box-shadow:inset 0 0 0 calc(var(--w)*0.03) #fff}
+
+/* ============ 設問 ============ */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 16px 18px}
+.q{font-family:var(--mincho);font-size:19.5px;letter-spacing:.04em;margin:0 0 3px}
+.q + .choices{margin-top:14px}
+.q-note{font-size:13.5px;color:var(--sub);margin:0 0 14px}
+
+.choices{display:flex;gap:9px;flex-wrap:wrap}
+button{font-family:var(--gothic);font-size:15.5px;cursor:pointer}
+.btn{
+  border:1px solid var(--line-2);background:var(--surface-2);color:var(--ink);
+  border-radius:8px;padding:10px 20px;transition:border-color .12s, background .12s;
+}
+.btn:hover{border-color:var(--sub)}
+.btn:focus-visible{outline:2px solid var(--ai);outline-offset:2px}
+.btn.on{border-color:var(--ai);background:color-mix(in srgb,var(--ai) 10%,var(--surface));color:var(--ink)}
+.btn.primary{background:var(--midori-d);border-color:var(--midori-d);color:#fff}
+.btn.primary:hover{background:var(--midori)}
+.btn:disabled{opacity:.6;cursor:default}
+.btn.two{display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:8px 18px;line-height:1.45}
+.blabel{font-size:15.5px}
+.bnote{font-size:12px;color:var(--sub);letter-spacing:.02em}
+.btn.two.on .bnote{color:var(--ai)}
+
+.windrow{display:flex;align-items:center;gap:14px;margin:10px 0}
+.windlab{font-size:13.5px;color:var(--sub);width:74px;flex:none}
+.windrow .yaku-chips{margin-bottom:0}
+.chip.wind{font-family:var(--mincho);font-size:18px;font-weight:600;padding:5px 20px;letter-spacing:.1em}
+
+.picker{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.prow2{display:flex;gap:3px;flex-wrap:wrap}
+.pick{
+  --w:clamp(24px,5.4vw,34px);
+  cursor:pointer;background:none;border:none;padding:0;
+  border-radius:calc(var(--w)*0.13);
+}
+.pick .tile{--w:inherit}
+.pick[aria-pressed="true"] .tile{
+  transform:translateY(-7px);
+  box-shadow:0 2px 0 var(--ivory-rim),0 9px 12px rgba(0,0,0,.24),0 0 0 2px var(--ai);
+}
+.pick:focus-visible{outline:2px solid var(--ai);outline-offset:2px}
+
+.sub-q{font-size:12px;letter-spacing:.14em;color:var(--sub);margin:16px 0 7px}
+.yaku-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.chip{
+  border:1px solid var(--line-2);background:var(--surface-2);color:var(--ink);
+  border-radius:999px;padding:8px 17px;font-size:15px;
+}
+.chip[aria-pressed="true"]{border-color:var(--ai);background:color-mix(in srgb,var(--ai) 12%,var(--surface));font-weight:500}
+.chip:focus-visible{outline:2px solid var(--ai);outline-offset:2px}
+
+.qblock{
+  margin:0 -16px;padding:28px 16px 10px;
+  border-top:2px solid var(--line-2);
+}
+.qblock:first-child{border-top:0;padding-top:2px}
+.qblock + .qblock{background:linear-gradient(var(--surface-2),var(--surface) 64px)}
+.vline{margin-bottom:4px}
+.vline{display:flex;align-items:center;gap:14px;margin-top:14px;animation:pop .2s ease-out both}
+.vtxt{font-family:var(--mincho);font-size:24px;font-weight:600;letter-spacing:.1em;line-height:1.2}
+.vline.ok .vtxt{color:var(--ok-text)}
+.vline.ng .vtxt{color:var(--ng-text)}
+.vline.dk .vtxt{color:var(--sub)}
+.chip-note{font-size:13px;color:var(--sub);margin:6px 0 0}
+.riichiline{font-size:15px;color:var(--ink);margin:14px 0 2px}
+.winline{display:flex;align-items:center;gap:9px;margin:4px 0 16px;flex-wrap:wrap}
+.wl-ji{font-size:14.5px;color:var(--ink)}
+.wl-key{
+  font-family:var(--mincho);font-size:19px;font-weight:600;letter-spacing:.14em;
+  color:var(--ink);border-bottom:2px solid var(--ai);padding:0 4px 1px;
+}
+.ansline{display:flex;align-items:center;gap:11px;margin-top:9px;flex-wrap:wrap}
+.anslabel{
+  font-size:11.5px;letter-spacing:.14em;color:var(--sub);
+  border:1px solid var(--line-2);border-radius:999px;padding:3px 11px;white-space:nowrap;
+}
+.ansval{font-family:var(--mincho);font-size:19px;font-weight:600;color:var(--ok-text)}
+.ansline .grp{display:flex;gap:3px}
+.ansline .tile{--w:clamp(22px,5vw,32px)}
+.anschips{display:flex;gap:7px;flex-wrap:wrap}
+.anschip{
+  display:inline-flex;align-items:center;gap:7px;
+  border:1px solid var(--ok-text);color:var(--ok-text);background:none;
+  border-radius:999px;padding:5px 14px;font-size:14.5px;font-weight:500;
+}
+.anschip.miss{
+  background:var(--ok-fill);border-color:var(--ok-fill);color:#fff;
+  font-weight:700;font-size:16px;padding:7px 16px;
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--ok-text) 25%,transparent);
+}
+.miss-tag{
+  font-size:11px;font-weight:700;letter-spacing:.08em;line-height:1;
+  background:#fff;color:var(--ok-fill);border-radius:3px;padding:3px 5px;
+}
+.btn.on:disabled{opacity:1}
+.chip:disabled,.pick:disabled{cursor:default}
+.chip:disabled{opacity:.6}
+.chip[aria-pressed="true"]:disabled{opacity:1}
+.pick:disabled .tile{opacity:.5}
+.pick[aria-pressed="true"]:disabled .tile{opacity:1}
+.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:2px}
+.btn.back{background:none;border-color:transparent;color:var(--sub);padding:10px 8px}
+.btn.back:hover{border-color:var(--line-2);color:var(--ink)}
+
+
+/* ============ 判定・解説 ============ */
+.result-head{
+  font-family:var(--mincho);font-size:23px;letter-spacing:.1em;font-weight:600;
+  margin:0 0 11px;line-height:1.2;
+}
+.result-head.ok{color:var(--ok-text)}
+.result-head.ng{color:var(--ng-text)}
+.verdict{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.mark{
+  display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:500;
+  border:1px solid var(--line-2);border-radius:999px;padding:5px 15px;
+}
+.mark b{font-family:var(--mincho);font-size:16px;line-height:1}
+.mark.ok{background:var(--ok-fill);border-color:var(--ok-fill);color:#fff}
+.mark.ng{background:var(--ng-fill);border-color:var(--ng-fill);color:#fff}
+
+@keyframes pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.result-head{animation:pop .2s ease-out both}
+.verdict .mark{animation:pop .18s ease-out both}
+.verdict .mark:nth-child(2){animation-delay:.07s}
+.verdict .mark:nth-child(3){animation-delay:.14s}
+
+.why{font-size:13.5px;line-height:1.9}
+.why h3{
+  font-family:var(--gothic);font-size:11px;letter-spacing:.14em;color:var(--sub);
+  font-weight:500;margin:16px 0 6px;
+}
+.why h3:first-child{margin-top:0}
+.why ul{margin:0;padding-left:1.15em}
+.why li{margin:2px 0}
+.melds{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin:4px 0 10px}
+.grp{display:flex;gap:2px}
+.why .grp .tile{--w:clamp(20px,4.6vw,30px)}
+.why .grp .tile.win{--w:clamp(22px,5.2vw,34px)}
+.why .cap{font-size:11.5px;color:var(--sub);margin-top:4px}
+.why em{font-style:normal;color:var(--aka);font-weight:500}
+
+.foot{font-size:13px;color:var(--sub);text-align:center;line-height:1.9}
+.foot b{color:var(--ink);font-weight:500}
+
+@media (prefers-reduced-motion: reduce){
+  *{transition:none !important;animation:none !important}
+}
+</style>
+</head>
+<body>
+
+<!-- 解いた記録はここに書き込まれます。プログラムではなくデータです。 -->
+<script id="mj-records" type="application/json">[]</script>
+<script id="mj-settings" type="application/json">null</script>
+
+<div class="wrap">
+
+  <header>
+    <h1>テンパイ1000本ノック<span class="sub">TENPAI · WAITS · YAKU</span></h1>
+    <div class="savebox">
+      <span class="unsaved" id="unsaved"></span>
+      <button class="btn save" id="save">記録を保存</button>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs"></nav>
+
+  <div class="stats" id="stats"></div>
+
+  <div id="drill">
+    <div id="tableHost"></div>
+    <div class="panel" id="panel"></div>
+  </div>
+
+  <div class="panel" id="listView" hidden></div>
+  <div class="panel agg" id="aggView" hidden></div>
+  <div class="panel conf" id="confView" hidden></div>
+
+  <p class="foot" id="foot"></p>
+
+</div>
+
+<script>
+/* ==========================================================
+   麻雀 判定エンジン
+   0-8=1m..9m / 9-17=1p..9p / 18-26=1s..9s
+   27=東 28=南 29=西 30=北 31=白 32=發 33=中
+   ========================================================== */
+const JP = (() => {
+  const k = ['','一','二','三','四','五','六','七','八','九'], a = [];
+  for (let n=1;n<=9;n++) a.push(k[n]+'萬');
+  for (let n=1;n<=9;n++) a.push(n+'筒');
+  for (let n=1;n<=9;n++) a.push(n+'索');
+  return a.concat(['東','南','西','北','白','發','中']);
+})();
+const isHonor = i => i >= 27;
+const suitOf  = i => (i < 27 ? Math.floor(i/9) : 3);
+const rankOf  = i => (i < 27 ? (i%9)+1 : 0);
+const isTerminal = i => isHonor(i) || rankOf(i)===1 || rankOf(i)===9;
+const total = c => c.reduce((a,b)=>a+b,0);
+
+function walk(c, acc, out){
+  let i = 0; while (i < 34 && c[i] === 0) i++;
+  if (i === 34){ out.push(acc.slice()); return; }
+  if (c[i] >= 3){
+    c[i]-=3; acc.push({type:'set',start:i}); walk(c,acc,out); acc.pop(); c[i]+=3;
+  }
+  if (i < 27 && rankOf(i) <= 7 && c[i+1] > 0 && c[i+2] > 0){
+    c[i]--;c[i+1]--;c[i+2]--; acc.push({type:'run',start:i}); walk(c,acc,out); acc.pop(); c[i]++;c[i+1]++;c[i+2]++;
+  }
+}
+function decompose(counts){
+  const res = [], c = counts.slice();
+  for (let p=0;p<34;p++){
+    if (c[p] < 2) continue;
+    c[p]-=2;
+    const found = []; walk(c,[],found);
+    for (const melds of found) res.push({pair:p, melds});
+    c[p]+=2;
+  }
+  return res;
+}
+/* 七対子。同じ牌2枚が7種類。4枚使いは認めない（標準ルール） */
+function isChiitoi(c14){
+  let pairs = 0;
+  for (let i=0;i<34;i++){
+    if (c14[i] === 0) continue;
+    if (c14[i] !== 2) return false;
+    pairs++;
+  }
+  return pairs === 7;
+}
+const isWin = c => total(c) === 14 && (decompose(c).length > 0 || isChiitoi(c));
+
+/* 面子の分け方に関係なく決まる性質 */
+function suitInfo(c14){
+  let hasTerminal = false; const suits = new Set(); let honors = 0;
+  for (let i=0;i<34;i++){
+    if (!c14[i]) continue;
+    if (isTerminal(i)) hasTerminal = true;
+    if (isHonor(i)) honors++; else suits.add(suitOf(i));
+  }
+  return { hasTerminal, isChinitsu: suits.size===1 && honors===0,
+           isHonitsu: suits.size===1 && honors>0 };
+}
+
+function waits(c13){
+  const res = [];
+  for (let i=0;i<34;i++){
+    if (c13[i] >= 4) continue;
+    c13[i]++; if (isWin(c13)) res.push(i); c13[i]--;
+  }
+  return res;
+}
+function isChiitoitsuTenpai(c){
+  let pairs=0, singles=0;
+  for (let i=0;i<34;i++){
+    if (c[i]===2) pairs++; else if (c[i]===1) singles++; else if (c[i]!==0) return false;
+  }
+  return pairs===6 && singles===1;
+}
+function isKokushiTenpai(c){
+  let kinds=0, pair=0, other=0;
+  for (let i=0;i<34;i++){
+    if (!c[i]) continue;
+    if (!isTerminal(i)){ other++; continue; }
+    kinds++; if (c[i]>=2) pair++;
+  }
+  if (other) return false;
+  return kinds===13 || (kinds===12 && pair===1);
+}
+
+function yakuhaiOf(dec, bakaze, jikaze){
+  const list = [];
+  for (const m of dec.melds){
+    if (m.type !== 'set') continue;
+    const i = m.start;
+    if (i===31||i===32||i===33) list.push(JP[i]);
+    if (i===bakaze) list.push('場風 '+JP[i]);
+    if (i===jikaze) list.push('自風 '+JP[i]);
+  }
+  return list;
+}
+function ryanmenRun(dec, winTile){
+  for (const m of dec.melds){
+    if (m.type !== 'run') continue;
+    const s = m.start, r = rankOf(s);
+    if (winTile === s && r <= 6) return m;
+    if (winTile === s+2 && r >= 2) return m;
+  }
+  return null;
+}
+function evalDec(c14, dec, winTile, bakaze, jikaze, winBy){
+  const yaku = [];
+  const si = suitInfo(c14);
+  const runs = dec.melds.filter(m => m.type === 'run');
+  const sets = dec.melds.filter(m => m.type === 'set');
+  const isChinitsu = si.isChinitsu;
+
+  /* --- 牌の種類で決まるもの --- */
+  if (!si.hasTerminal) yaku.push({key:'tanyao', name:'タンヤオ', han:1});
+  if (isChinitsu)        yaku.push({key:'chinitsu', name:'清一色', han:6});
+  else if (si.isHonitsu) yaku.push({key:'honitsu', name:'ホンイツ', han:3});
+
+  /* --- 役牌・小三元 --- */
+  for (const n of yakuhaiOf(dec, bakaze, jikaze)) yaku.push({key:'yakuhai', name:'役牌（'+n+'）', han:1});
+  if (sets.filter(m => m.start >= 31).length === 2 && dec.pair >= 31)
+    yaku.push({key:'shousangen', name:'小三元', han:2});
+
+  /* --- ピンフ --- */
+  const allRuns = runs.length === 4;
+  const pairYakuhai = dec.pair===31||dec.pair===32||dec.pair===33||dec.pair===bakaze||dec.pair===jikaze;
+  if (allRuns && !pairYakuhai && ryanmenRun(dec, winTile)) yaku.push({key:'pinfu', name:'ピンフ', han:1});
+
+  /* --- 一盃口・二盃口（二盃口が立てば一盃口は付けない） --- */
+  const rk = {}; for (const m of runs) rk[m.start] = (rk[m.start]||0) + 1;
+  let pairsOfRuns = 0, dup = 0;
+  for (const k in rk){ pairsOfRuns += Math.floor(rk[k]/2); if (rk[k] >= 2) dup++; }
+  if (pairsOfRuns >= 2)   yaku.push({key:'ryanpeiko', name:'二盃口', han:3});
+  else if (dup >= 1)      yaku.push({key:'iipeiko',   name:'一盃口', han:1});
+
+  /* --- 一気通貫 --- */
+  for (const su of [0,1,2]){
+    const st = new Set(runs.filter(m => suitOf(m.start)===su).map(m => rankOf(m.start)));
+    if (st.has(1) && st.has(4) && st.has(7)){ yaku.push({key:'ittsu', name:'一気通貫', han:2}); break; }
+  }
+
+  /* --- 三色同順・三色同刻 --- */
+  const byRank = {};
+  for (const m of runs){ const r = rankOf(m.start); (byRank[r] = byRank[r] || new Set()).add(suitOf(m.start)); }
+  for (const r in byRank) if (byRank[r].size >= 3){ yaku.push({key:'sanshoku', name:'三色同順', han:2}); break; }
+  const setRank = {};
+  for (const m of sets){ if (isHonor(m.start)) continue; const r = rankOf(m.start); (setRank[r] = setRank[r] || new Set()).add(suitOf(m.start)); }
+  for (const r in setRank) if (setRank[r].size >= 3){ yaku.push({key:'sanshokudoukou', name:'三色同刻', han:2}); break; }
+
+  /* --- 対々和・暗刻の数 --- */
+  if (sets.length === 4) yaku.push({key:'toitoi', name:'対々和', han:2});
+  /* 門前なので、ロンで刻子を完成させたときだけ1つ明刻になる */
+  const ronSet = (winBy === 'ron') && sets.some(m => m.start === winTile);
+  const ankou  = sets.length - (ronSet ? 1 : 0);
+  if (ankou === 4)      yaku.push({key:'suuankou', name:'四暗刻', han:13});
+  else if (ankou === 3) yaku.push({key:'sanankou', name:'三暗刻', han:2});
+
+  /* --- チャンタ・純チャン・混老頭（上位ひとつだけ） --- */
+  const yaoMeld = m => m.type === 'set' ? isTerminal(m.start) : (rankOf(m.start)===1 || rankOf(m.start)===7);
+  if (dec.melds.every(yaoMeld) && isTerminal(dec.pair)){
+    let allYaoTiles = true, hasHonor = false;
+    for (let i=0;i<34;i++) if (c14[i] && !isTerminal(i)) allYaoTiles = false;
+    for (let i=27;i<34;i++) if (c14[i]) hasHonor = true;
+    if (allYaoTiles)    yaku.push({key:'honroutou', name:'混老頭', han:2});
+    else if (!hasHonor) yaku.push({key:'junchan',   name:'純チャン', han:3});
+    else                yaku.push({key:'chanta',    name:'チャンタ', han:2});
+  }
+
+  /* 役満は単独。四暗刻が立ったら他の役は数えない */
+  const suu = yaku.find(y => y.key === 'suuankou');
+  if (suu) return {yaku:[suu], isChinitsu};
+
+  return {yaku, isChinitsu};
+}
+
+/* 対象外にする役満。四暗刻だけは役として扱うので、ここには入れない */
+function bigYaku(c14, dec){
+  const bad = [];
+  const sets = dec ? dec.melds.filter(m => m.type==='set') : [];
+  const GREEN = new Set([19,20,21,23,25,32]);        // 2索3索4索6索8索發
+  let honors = 0, allHonor = true, allTerminal = true, green = true, any = false;
+  for (let i=0;i<34;i++){
+    if (!c14[i]) continue;
+    any = true;
+    if (isHonor(i)) honors += c14[i]; else allHonor = false;
+    if (!isTerminal(i)) allTerminal = false;
+    if (!GREEN.has(i)) green = false;
+  }
+  if (any && allHonor)                  bad.push('字一色');
+  if (any && allTerminal && honors===0) bad.push('清老頭');
+  if (any && green)                     bad.push('緑一色');
+  if (sets.filter(m => m.start >= 31).length === 3) bad.push('大三元');
+  const windSets = sets.filter(m => m.start >= 27 && m.start <= 30).length;
+  if (windSets === 4) bad.push('大四喜');
+  if (windSets === 3 && dec && dec.pair >= 27 && dec.pair <= 30) bad.push('小四喜');
+  for (const su of [0,1,2]){
+    let only = true, n = 0;
+    for (let i=0;i<34;i++) if (c14[i]){ if (suitOf(i)!==su) only = false; else n += c14[i]; }
+    if (!only || n !== 14) continue;
+    const base = su*9;
+    let ok = c14[base] >= 3 && c14[base+8] >= 3;
+    for (let r=1;r<=7;r++) if (c14[base+r] < 1) ok = false;
+    if (ok) bad.push('九蓮宝燈');
+  }
+  return bad;
+}
+
+function judgeWin(c14, winTile, bakaze, jikaze, winBy){
+  const decs = decompose(c14);
+  const chiitoi = isChiitoi(c14);
+  if (!decs.length && !chiitoi) return null;
+
+  let best = null;
+  for (const d of decs){
+    const r = evalDec(c14, d, winTile, bakaze, jikaze, winBy);
+    const han = r.yaku.reduce((a,y)=>a+y.han,0);
+    if (!best || han > best.han) best = {han, yaku:r.yaku, dec:d, isChinitsu:r.isChinitsu};
+  }
+  if (chiitoi){
+    const si = suitInfo(c14);
+    const yaku = [{key:'chiitoi', name:'七対子', han:2}];
+    if (!si.hasTerminal)   yaku.push({key:'tanyao', name:'タンヤオ', han:1});
+    if (si.isChinitsu)     yaku.push({key:'chinitsu', name:'清一色', han:6});
+    else if (si.isHonitsu) yaku.push({key:'honitsu', name:'ホンイツ', han:3});
+    let allYao = true;
+    for (let i=0;i<34;i++) if (c14[i] && !isTerminal(i)) allYao = false;
+    if (allYao) yaku.push({key:'honroutou', name:'混老頭', han:2});
+    const han = yaku.reduce((a,y)=>a+y.han,0);
+    if (!best || han > best.han) best = {han, yaku, dec:null, isChinitsu:si.isChinitsu};
+  }
+
+  const big = new Set();
+  for (const d of decs) for (const n of bigYaku(c14, d)) big.add(n);
+  for (const n of bigYaku(c14, null)) big.add(n);
+  best.bigYaku = [...big];
+  return best;
+}
+
+/* 待ちの形の呼び名 */
+function waitShape(c14, winTile, bakaze, jikaze){
+  const decs = decompose(c14);
+  if (!decs.length && isChiitoi(c14)) return '単騎待ち';
+  let fallback = '';
+  for (const d of decs){
+    if (ryanmenRun(d, winTile)) return '両面待ち';
+  }
+  for (const d of decs){
+    if (d.pair === winTile) { fallback = fallback || '単騎待ち'; continue; }
+    for (const m of d.melds){
+      if (m.type==='set' && m.start===winTile) { fallback = fallback || 'シャンポン待ち'; }
+      if (m.type==='run'){
+        const s=m.start, r=rankOf(s);
+        if (winTile===s+1) fallback = fallback || '嵌張待ち';
+        else if ((winTile===s && r===7) || (winTile===s+2 && r===1)) fallback = fallback || '辺張待ち';
+      }
+    }
+  }
+  return fallback || '';
+}
+
+/* ==========================================================
+   問題ジェネレータ
+   ========================================================== */
+const rnd = n => Math.floor(Math.random()*n);
+const pick = a => a[rnd(a.length)];
+const SANGEN = [31,32,33];
+const HONORS_ALL = [27,28,29,30,31,32,33];
+const RUNS_ALL = (()=>{const a=[];for(const b of [0,9,18])for(let r=0;r<=6;r++)a.push(b+r);return a;})();
+const RUNS_SIMPLE = (()=>{const a=[];for(const b of [0,9,18])for(let r=1;r<=5;r++)a.push(b+r);return a;})();
+const TILES_ALL = Array.from({length:34},(_,i)=>i);
+const TILES_SIMPLE = (()=>{const a=[];for(const b of [0,9,18])for(let r=1;r<=7;r++)a.push(b+r);return a;})();
+const runsOfSuit = s => {const a=[];for(let r=0;r<=6;r++)a.push(s*9+r);return a;};
+const tilesOfSuit = s => {const a=[];for(let r=0;r<=8;r++)a.push(s*9+r);return a;};
+
+function addMeld(c,m){ if(m.type==='run'){c[m.start]++;c[m.start+1]++;c[m.start+2]++;} else c[m.start]+=3; }
+const overflow = c => c.some(v=>v>4);
+function assemble(melds, pair){
+  const c = new Array(34).fill(0);
+  for (const m of melds) addMeld(c,m);
+  c[pair]+=2;
+  return overflow(c) ? null : c;
+}
+function build(target, bakaze, jikaze){
+  const melds = []; let pair;
+  if (target === 'tanyao'){
+    const n = rnd(3);
+    for (let i=0;i<n;i++) melds.push({type:'set',start:pick(TILES_SIMPLE)});
+    while (melds.length<4) melds.push({type:'run',start:pick(RUNS_SIMPLE)});
+    pair = pick(TILES_SIMPLE);
+  } else if (target === 'yakuhai'){
+    melds.push({type:'set',start:pick(SANGEN.concat([bakaze,jikaze]))});
+    if (Math.random()<0.3) melds.push({type:'set',start:pick(TILES_ALL)});
+    while (melds.length<4) melds.push({type:'run',start:pick(RUNS_ALL)});
+    pair = pick(TILES_ALL);
+  } else if (target === 'honitsu'){
+    const s = rnd(3);
+    const nh = 1 + rnd(2);
+    for (let i=0;i<nh && melds.length<2;i++) melds.push({type:'set',start:pick(HONORS_ALL)});
+    while (melds.length<4) melds.push({type:'run',start:pick(runsOfSuit(s))});
+    pair = Math.random()<0.5 ? pick(HONORS_ALL) : pick(tilesOfSuit(s));
+  } else if (target === 'iipeiko'){
+    const r = pick(RUNS_ALL);
+    melds.push({type:'run',start:r},{type:'run',start:r});
+    if (Math.random()<0.3) melds.push({type:'set',start:pick(TILES_ALL)});
+    while (melds.length<4) melds.push({type:'run',start:pick(RUNS_ALL)});
+    pair = pick(TILES_ALL);
+  } else if (target === 'pinfu'){
+    while (melds.length<4) melds.push({type:'run',start:pick(RUNS_ALL)});
+    const bad = new Set(SANGEN.concat([bakaze,jikaze]));
+    pair = pick(TILES_ALL.filter(t=>!bad.has(t)));
+  } else if (target === 'ittsu'){
+    const su = rnd(3);
+    melds.push({type:'run', start:su*9}, {type:'run', start:su*9+3}, {type:'run', start:su*9+6});
+    if (Math.random() < 0.4){                       /* 字牌を足してホンイツにもなる形 */
+      melds.push({type:'set', start:pick(HONORS_ALL)});
+      pair = Math.random()<0.5 ? pick(HONORS_ALL) : pick(tilesOfSuit(su));
+    } else {                                        /* 別の色を1面子 */
+      const o = (su + 1 + rnd(2)) % 3;
+      melds.push({type:'run', start:pick(runsOfSuit(o))});
+      pair = Math.random()<0.5 ? pick(tilesOfSuit(o)) : pick(HONORS_ALL);
+    }
+
+  } else if (target === 'chiitoi'){
+    /* 異なる7種の対子。字牌が多くなりすぎないよう軽く抑える */
+    const pool = TILES_ALL.slice();
+    for (let i=pool.length-1;i>0;i--){ const j=rnd(i+1); const t=pool[i]; pool[i]=pool[j]; pool[j]=t; }
+    const picked = pool.slice(0,7);
+    const c = new Array(34).fill(0);
+    for (const t of picked) c[t] = 2;
+    return c;
+
+  } else if (target === 'mixed'){
+    /* 例：23筒 の両面。4筒ならタンヤオ、1筒だと么九牌が入って崩れる。
+       ピンフが両方の待ちに乗らないよう、刻子を1つ入れておく。       */
+    melds.push({type:'set', start: pick(TILES_SIMPLE)});
+    const r1 = pick(RUNS_SIMPLE);
+    let r2 = pick(RUNS_SIMPLE);
+    for (let i=0;i<8 && r2===r1;i++) r2 = pick(RUNS_SIMPLE);
+    if (r2 === r1) return null;
+    melds.push({type:'run', start:r1}, {type:'run', start:r2});
+    pair = pick(TILES_SIMPLE);
+    const c = assemble(melds, pair);
+    if (!c) return null;
+    /* 端にかかる両面の受け（23 か 78）を2枚足す */
+    const suit = rnd(3);
+    const base = suit*9 + (Math.random()<0.5 ? 1 : 6);
+    c[base]++; c[base+1]++;
+    return overflow(c) ? null : c;
+  } else if (target === 'sanshoku'){
+    const r = rnd(7);                                   // 123〜789
+    for (const su of [0,1,2]) melds.push({type:'run', start:su*9+r});
+    melds.push({type:'run', start:pick(RUNS_ALL)});
+    pair = pick(TILES_ALL);
+
+  } else if (target === 'sanshokudoukou'){
+    const r = 1 + rnd(9) - 1;                           // 1〜9
+    for (const su of [0,1,2]) melds.push({type:'set', start:su*9+r});
+    melds.push({type:'run', start:pick(RUNS_ALL)});
+    pair = pick(TILES_ALL);
+
+  } else if (target === 'ryanpeiko'){
+    const a = pick(RUNS_ALL);
+    let b = pick(RUNS_ALL);
+    for (let i=0;i<10 && b===a;i++) b = pick(RUNS_ALL);
+    if (b === a) return null;
+    melds.push({type:'run',start:a},{type:'run',start:a},{type:'run',start:b},{type:'run',start:b});
+    pair = pick(TILES_ALL);
+
+  } else if (target === 'toitoi' || target === 'sanankou' || target === 'suuankou'){
+    const nSets = target === 'sanankou' ? 3 : 4;
+    for (let i=0;i<nSets;i++) melds.push({type:'set', start:pick(TILES_ALL)});
+    while (melds.length < 4) melds.push({type:'run', start:pick(RUNS_ALL)});
+    pair = pick(TILES_ALL);
+
+  } else if (target === 'chanta' || target === 'junchan'){
+    const honorsOk = target === 'chanta';
+    const edgeRuns = [0,6,9,15,18,24];                  // 123 / 789 の3色
+    const yaoTiles = [0,8,9,17,18,26];                  // 1・9
+    const src = honorsOk ? yaoTiles.concat(HONORS_ALL) : yaoTiles;
+    let usedHonor = false;
+    for (let i=0;i<4;i++){
+      if (Math.random() < 0.45){
+        const t = pick(src);
+        if (isHonor(t)) usedHonor = true;
+        melds.push({type:'set', start:t});
+      } else melds.push({type:'run', start:pick(edgeRuns)});
+    }
+    pair = pick(src);
+    if (isHonor(pair)) usedHonor = true;
+    if (honorsOk && !usedHonor) return null;            // 字牌が無いと純チャンになる
+    if (!honorsOk && usedHonor) return null;
+
+  } else if (target === 'honroutou'){
+    const src = [0,8,9,17,18,26].concat(HONORS_ALL);
+    for (let i=0;i<4;i++) melds.push({type:'set', start:pick(src)});
+    pair = pick(src);
+
+  } else if (target === 'shousangen'){
+    const sh = SANGEN.slice();
+    for (let i=sh.length-1;i>0;i--){ const j=rnd(i+1); const t=sh[i]; sh[i]=sh[j]; sh[j]=t; }
+    melds.push({type:'set', start:sh[0]}, {type:'set', start:sh[1]});
+    while (melds.length < 4) melds.push({type:'run', start:pick(RUNS_ALL)});
+    pair = sh[2];
+
+  } else if (target === 'chinitsu'){
+    const su = rnd(3);
+    const nSets = rnd(2);
+    for (let i=0;i<nSets;i++) melds.push({type:'set', start:pick(tilesOfSuit(su))});
+    while (melds.length < 4) melds.push({type:'run', start:pick(runsOfSuit(su))});
+    pair = pick(tilesOfSuit(su));
+
+  } else {
+    const n = rnd(3);
+    for (let i=0;i<n;i++) melds.push({type:'set',start:pick(TILES_ALL)});
+    while (melds.length<4) melds.push({type:'run',start:pick(RUNS_ALL)});
+    pair = pick(TILES_ALL);
+  }
+  return assemble(melds, pair);
+}
+function dropOne(c14){
+  const p = []; for (let i=0;i<34;i++) if (c14[i]) p.push(i);
+  const c = c14.slice(); c[pick(p)]--; return c;
+}
+function validate(c13, bakaze, jikaze, maxWaits, winBy){
+  if (total(c13)!==13) return null;
+  if (isKokushiTenpai(c13)) return null;
+  const w = waits(c13);
+  if (!w.length || w.length > maxWaits) return null;
+  const per = [];
+  for (const t of w){
+    const c14 = c13.slice(); c14[t]++;
+    const r = judgeWin(c14, t, bakaze, jikaze, winBy);
+    if (!r || r.bigYaku.length) return null;                 // 役満は扱わない
+    const keys = r.yaku.map(y=>y.key);
+    if (keys.some(k => !yakuOn(k))) return null;              // 対象外の役がつく手は出さない
+    per.push({tile:t, yaku:r.yaku.map(y=>y.name), keys});
+  }
+  /* 待ちごとに役がつくかを見て、そろっているか混在かを決める */
+  const f = per.map(x => x.keys.length > 0);
+  const yakuKind = f.every(v => v) ? 'yaku' : f.every(v => !v) ? 'noyaku' : 'mixed';
+  return {hand:c13, waits:w, perWait:per, yakuKind};
+}
+function makeNoten(){
+  for (let i=0;i<400;i++){
+    const c14 = build('none',27,28); if (!c14) continue;
+    const c13 = dropOne(c14);
+    const p = []; for (let k=0;k<34;k++) if (c13[k]) p.push(k);
+    const from = pick(p), to = pick(TILES_ALL);
+    if (from === to) continue;
+    const d = c13.slice(); d[from]--; d[to]++;
+    if (overflow(d) || total(d)!==13) continue;
+    if (waits(d).length) continue;
+    if (isChiitoitsuTenpai(d) || isKokushiTenpai(d)) continue;
+    return d;
+  }
+  return null;
+}
+const windsFromOya = seat => 27 + ((4 - seat) % 4);
+
+/* ===== 設定 =====
+   ONにした役だけを出題し、OFFの役がつく手は出さない（B案）。 */
+const ALL_YAKU = [
+  {key:'riichi',         label:'リーチ'},
+  {key:'tsumo',          label:'メンゼンツモ'},
+  {key:'tanyao',         label:'タンヤオ'},
+  {key:'pinfu',          label:'ピンフ'},
+  {key:'iipeiko',        label:'一盃口（イーペーコー）'},
+  {key:'honitsu',        label:'ホンイツ'},
+  {key:'yakuhai',        label:'役牌（やくはい）'},
+  {key:'chiitoi',        label:'七対子（チートイツ）'},
+  {key:'ittsu',          label:'一気通貫（イッキツウカン）'},
+  {key:'sanshoku',       label:'三色同順（サンショクドウジュン）'},
+  {key:'chanta',         label:'チャンタ'},
+  {key:'junchan',        label:'純チャン（ジュンチャン）'},
+  {key:'honroutou',      label:'混老頭（ホンロウトウ）'},
+  {key:'ryanpeiko',      label:'二盃口（リャンペーコー）'},
+  {key:'sanshokudoukou', label:'三色同刻（サンショクドウコウ）'},
+  {key:'shousangen',     label:'小三元（ショウサンゲン）'},
+  {key:'chinitsu',       label:'清一色（チンイツ）'},
+  {key:'toitoi',         label:'対々和（トイトイ）'},
+  {key:'sanankou',       label:'三暗刻（サンアンコウ）'},
+  {key:'suuankou',       label:'四暗刻（スーアンコウ）'}
+];
+const DEFAULT_ON = ['riichi','tsumo','tanyao','pinfu','iipeiko','honitsu','yakuhai','chiitoi','ittsu'];
+const MAX_ON = 15;                       // 選択肢が増えすぎないよう、ONにできる上限
+let settings = { on:{}, notenRate:0.25 };
+for (const o of ALL_YAKU) settings.on[o.key] = DEFAULT_ON.indexOf(o.key) >= 0;
+const yakuOn = k => !!settings.on[k];
+const onKeys = () => ALL_YAKU.filter(o => settings.on[o.key]).map(o => o.key);
+/* 狙って作る役。ONのものだけを回す */
+const BUILDABLE = ['tanyao','pinfu','iipeiko','honitsu','yakuhai','chiitoi','ittsu',
+                   'sanshoku','chanta','junchan','honroutou','ryanpeiko',
+                   'sanshokudoukou','shousangen','chinitsu','toitoi','sanankou','suuankou'];
+function rollTarget(){
+  const pool = BUILDABLE.filter(k => settings.on[k]);
+  const x = Math.random();
+  if (!pool.length) return 'none';
+  if (x < 0.18) return 'none';
+  if (x < 0.32) return 'mixed';
+  return pool[rnd(pool.length)];
+}
+
+function makeProblem(){
+  for (let attempt=0; attempt<6000; attempt++){
+    const bakaze = Math.random()<0.7 ? 27 : 28;
+    /* メンゼンツモがOFFならロンだけ、リーチがOFFならリーチなしだけ */
+    const winBy  = settings.on.tsumo ? (Math.random()<0.5 ? 'tsumo' : 'ron') : 'ron';
+    const riichi = settings.on.riichi ? Math.random()<0.5 : false;
+    const seatOfOya = rnd(4);
+    const jikaze = windsFromOya(seatOfOya);
+    if (Math.random() < settings.notenRate){
+      const h = makeNoten(); if (!h) continue;
+      return {tenpai:false, yakuKind:'noyaku', hand:h, waits:[], answerTile:null, answerYaku:[], answerKeys:[], bakaze, jikaze, seatOfOya, winBy, riichi};
+    }
+    const target = rollTarget();
+    const built = build(target, bakaze, jikaze); if (!built) continue;
+    const c13 = target === 'mixed' ? built : dropOne(built);
+    const v = validate(c13, bakaze, jikaze, 3, winBy); if (!v) continue;
+    if (target === 'mixed' && v.yakuKind !== 'mixed') continue;
+    const cands = target === 'mixed' ? v.perWait
+                : target === 'none'  ? v.perWait.filter(p=>!p.keys.length)
+                : v.perWait.filter(p=>p.keys.includes(target));
+    if (!cands.length) continue;
+    const ans = pick(cands);
+    return {tenpai:true, yakuKind:v.yakuKind, hand:v.hand, waits:v.waits, answerTile:ans.tile, answerYaku:ans.yaku, answerKeys:ans.keys, bakaze, jikaze, seatOfOya, winBy, riichi};
+  }
+  return null;
+}
+
+/* ==========================================================
+   牌の描画
+   ========================================================== */
+const KAN = ['','一','二','三','四','五','六','七','八','九'];
+const HONOR_CH = ['東','南','西','北','白','發','中'];
+/* 筒子：実際の牌の配置に合わせた座標（3筒と7筒は斜め） */
+const PIN_LAYOUT = {
+  1:[[50,65,31]],
+  2:[[50,38,17],[50,92,17]],
+  3:[[26,32,16],[50,65,16],[74,98,16]],
+  4:[[30,40,17],[70,40,17],[30,90,17],[70,90,17]],
+  5:[[28,36,15],[72,36,15],[50,65,15],[28,94,15],[72,94,15]],
+  6:[[30,30,15],[70,30,15],[30,65,15],[70,65,15],[30,100,15],[70,100,15]],
+  7:[[26,22,12.5],[50,32,12.5],[74,42,12.5],[30,76,13],[70,76,13],[30,106,13],[70,106,13]],
+  8:[[32,25,12.5],[68,25,12.5],[32,55,12.5],[68,55,12.5],[32,85,12.5],[68,85,12.5],[32,112,12.5],[68,112,12.5]],
+  9:[[25,32,11.5],[50,32,11.5],[75,32,11.5],[25,65,11.5],[50,65,11.5],[75,65,11.5],[25,98,11.5],[50,98,11.5],[75,98,11.5]]
+};
+/* 索子：竹の位置と大きさ [cx,cy,幅,高さ,赤フラグ] */
+const SOU_LAYOUT = {
+  2:[[50,38,26,42,0],[50,95,26,42,0]],
+  3:[[50,32,24,40,0],[32,95,24,40,0],[68,95,24,40,0]],
+  4:[[30,35,24,42,0],[70,35,24,42,0],[30,95,24,42,0],[70,95,24,42,0]],
+  5:[[28,30,22,34,0],[72,30,22,34,0],[50,65,22,34,1],[28,100,22,34,0],[72,100,22,34,0]],
+  6:[[25,40,20,44,0],[50,40,20,44,0],[75,40,20,44,0],[25,95,20,44,0],[50,95,20,44,0],[75,95,20,44,0]],
+  7:[[50,25,18,32,1],[25,68,18,30,0],[50,68,18,30,0],[75,68,18,30,0],[25,105,18,30,0],[50,105,18,30,0],[75,105,18,30,0]],
+  8:[[15,38,15,40,0,0],[38,38,15,40,0,38],[62,38,15,40,0,-38],[85,38,15,40,0,0],
+     [15,95,15,40,0,0],[38,95,15,40,0,-38],[62,95,15,40,0,38],[85,95,15,40,0,0]],
+  9:[[25,30,18,30,0],[50,30,18,30,0],[75,30,18,30,0],[25,65,18,30,0],[50,65,18,30,0],[75,65,18,30,0],[25,100,18,30,0],[50,100,18,30,0],[75,100,18,30,0]]
+};
+const C_AI = '#1F4F8F', C_AKA = '#B1332C', C_IVORY = '#FFFDF7',
+      C_MIDORI = '#2C7A4B', C_MIDORI_D = '#1E5836', C_AKA_D = '#7D221D';
+
+function ring(x, y, r){
+  if (r > 25){    // 1筒は輪を多めに
+    return '<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="'+C_AI+'"/>'
+         + '<circle cx="'+x+'" cy="'+y+'" r="'+(r*0.80)+'" fill="'+C_IVORY+'"/>'
+         + '<circle cx="'+x+'" cy="'+y+'" r="'+(r*0.62)+'" fill="'+C_AI+'"/>'
+         + '<circle cx="'+x+'" cy="'+y+'" r="'+(r*0.40)+'" fill="'+C_IVORY+'"/>'
+         + '<circle cx="'+x+'" cy="'+y+'" r="'+(r*0.22)+'" fill="'+C_AKA+'"/>';
+  }
+  return '<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="'+C_AI+'"/>'
+       + '<circle cx="'+x+'" cy="'+y+'" r="'+(r*0.62)+'" fill="'+C_IVORY+'"/>'
+       + '<circle cx="'+x+'" cy="'+y+'" r="'+(r*0.30)+'" fill="'+C_AKA+'"/>';
+}
+function bamboo(cx, cy, w, h, red, deg){
+  const col = red ? C_AKA : C_MIDORI, dk = red ? C_AKA_D : C_MIDORI_D;
+  const top = cy - h/2, bot = cy + h/2, sw = w*0.34;
+  const rot = deg ? ' transform="rotate('+deg+' '+cx+' '+cy+')"' : '';
+  return '<g'+rot+'>'
+    /* 竹の幹 */
+    + '<rect x="'+(cx-sw/2)+'" y="'+top+'" width="'+sw+'" height="'+h+'" rx="'+(sw*0.42)+'" fill="'+col+'"/>'
+    /* 上下の切り口 */
+    + '<ellipse cx="'+cx+'" cy="'+(top+h*0.045)+'" rx="'+(w*0.30)+'" ry="'+(h*0.055)+'" fill="'+col+'"/>'
+    + '<ellipse cx="'+cx+'" cy="'+(bot-h*0.045)+'" rx="'+(w*0.30)+'" ry="'+(h*0.055)+'" fill="'+col+'"/>'
+    /* 節 */
+    + '<rect x="'+(cx-w*0.30)+'" y="'+(cy-h*0.065)+'" width="'+(w*0.60)+'" height="'+(h*0.13)+'" rx="'+(h*0.045)+'" fill="'+dk+'"/>'
+    + '</g>';
+}
+/* 一索は鳥。細部は追わず、輪郭で読ませる */
+function birdSvg(){
+  const g = C_MIDORI, d = C_MIDORI_D, r = C_AKA;
+  return '<g fill="none" stroke-linecap="round">'
+    /* 尾は胴の後ろ（左下）へ流す */
+    + '<path d="M40 74 C30 88 22 98 13 106" stroke="'+g+'" stroke-width="5"/>'
+    + '<path d="M42 79 C33 94 26 106 18 117" stroke="'+d+'" stroke-width="5"/>'
+    + '<path d="M46 82 C42 97 39 110 36 122" stroke="'+g+'" stroke-width="5"/>'
+    /* 胴 */
+    + '<ellipse cx="52" cy="60" rx="16" ry="20" fill="'+g+'" stroke="none"/>'
+    /* 翼 */
+    + '<path d="M44 50 C38 61 40 73 49 80" stroke="'+d+'" stroke-width="3.5"/>'
+    /* 首 */
+    + '<path d="M50 44 C48 33 54 25 61 25" stroke="'+g+'" stroke-width="8"/>'
+    /* 頭 */
+    + '<circle cx="63" cy="25" r="8.5" fill="'+g+'" stroke="none"/>'
+    /* 冠羽 */
+    + '<path d="M65 16 L69 8" stroke="'+r+'" stroke-width="2.6"/>'
+    /* くちばし */
+    + '<path d="M71 25 L82 28 L71 31 Z" fill="'+r+'" stroke="none"/>'
+    /* 目 */
+    + '<circle cx="64" cy="23" r="2.4" fill="'+C_IVORY+'" stroke="none"/>'
+    + '<circle cx="64.5" cy="23" r="1.1" fill="#1B1B1B" stroke="none"/>'
+    + '</g>';
+}
+function svgFace(inner){
+  return '<svg viewBox="0 0 100 130" preserveAspectRatio="xMidYMid meet" aria-hidden="true">' + inner + '</svg>';
+}
+function el(cls, txt){ const d = document.createElement('div'); d.className = cls; if (txt != null) d.textContent = txt; return d; }
+function tileEl(i, extra){
+  const w = el('tile' + (extra ? ' ' + extra : ''));
+  let f;
+  if (i < 9){
+    f = el('face man'); f.appendChild(el('num', KAN[i+1])); f.appendChild(el('wan','萬'));
+  } else if (i < 18){
+    const n = i-8; f = el('face');
+    f.innerHTML = svgFace(PIN_LAYOUT[n].map(a => ring(a[0], a[1], a[2])).join(''));
+  } else if (i < 27){
+    const n = i-17; f = el('face');
+    f.innerHTML = svgFace(n === 1 ? birdSvg()
+      : SOU_LAYOUT[n].map(a => bamboo(a[0], a[1], a[2], a[3], a[4], a[5])).join(''));
+  } else {
+    const n = i-27; f = el('face');
+    if (n === 4) f.appendChild(el('haku'));
+    else f.appendChild(el(n===5 ? 'honor hatsu' : n===6 ? 'honor chun' : 'honor kaze', HONOR_CH[n]));
+  }
+  w.appendChild(f);
+  return w;
+}
+function handTiles(counts){
+  const out = [];
+  for (let i=0;i<34;i++) for (let k=0;k<counts[i];k++) out.push(i);
+  return out;
+}
+
+/* ==========================================================
+   アプリ
+   ========================================================== */
+const $ = id => document.getElementById(id);
+const NOWIN = {key:'nowin', label:'あがれない（チョンボになる）'};
+/* 5役に加えて「メンゼンツモ」「あがれない」。どちらもツモ／ロン両方の回で出す。
+   全問門前なので、ツモの回は必ずメンゼンツモがつく。他の役と重ねて選ぶ。
+   「あがれない」だけは他と両立しないので単独選択。 */
+
+/* ONにした役だけを、ALL_YAKU の並び順で出す。最後に「あがれない」 */
+function yakuOptions(){
+  return ALL_YAKU.filter(o => settings.on[o.key]).concat([NOWIN]);
+}
+const yakuLabelOf = k => {
+  const o = ALL_YAKU.concat([NOWIN]).find(x => x.key === k);
+  return o ? o.label : k;
+};
+
+/* いまの問題の正解（役のキーの集合） */
+function wantKeys(){
+  const base = [...new Set(P.answerKeys)];
+  if (base.indexOf('suuankou') >= 0) return ['suuankou'];   // 役満は単独
+  if (P.riichi) base.push('riichi');
+  if (P.winBy === 'tsumo') base.push('tsumo');
+  return base.length ? base : ['nowin'];
+}
+/* 記録から同じものを出し直す */
+function realKeys(r){
+  const base = r.yaku ? [...new Set(r.yaku)] : [];
+  if (base.indexOf('suuankou') >= 0) return ['suuankou'];
+  if (r.ri) base.push('riichi');
+  if (r.by === 'tsumo') base.push('tsumo');
+  return base.length ? base : ['nowin'];
+}
+const SEAT_LABEL = ['自分が親','下家が親','対面が親','上家が親'];
+
+let agg = { total:0, windN:0, s0:0, s1:0, tenpaiN:0, s2:0, s3:0 };
+
+let P = null;                       // 現在の問題
+let said0 = { ba:null, ji:null };   // 1問目に選んだ風
+let said1 = null;                   // 2問目に選んだ答え
+let picked = new Set();             // 待ちの選択
+let pickedYaku = new Set();         // 役の選択
+let score = { s0:null, s1:null, s2:null, s3:null };
+let dunno = { s0:false, s1:false, s2:false, s3:false };   // 「分からない」を選んだか
+let lastRender = 0;                 // 画面を描いた時刻
+const tooSoon = () => Date.now() - lastRender < 320;
+
+/* ---------- 卓の描画 ---------- */
+/* 席の並びは 0=自分 1=下家(右) 2=対面 3=上家(左) */
+function tableEl(opts){
+  opts = opts || {};
+  const Q = opts.p || P;                      // 記録一覧からは過去の問題を渡す
+  const wrap = el('table' + (opts.inline ? ' inline' : ''));
+  const seats = el('seats');
+  const top = el('bar seat-top'), left = el('bar seat-left'), right = el('bar seat-right');
+  const bySeat = { 1: right, 2: top, 3: left };
+  if (Q.seatOfOya !== 0){
+    const tag = document.createElement('span');
+    tag.className = 'oya'; tag.textContent = '親（＝東）';
+    bySeat[Q.seatOfOya].appendChild(tag);
+  }
+  seats.appendChild(top); seats.appendChild(left); seats.appendChild(right);
+
+  const center = el('center');
+  center.appendChild(el('ba', JP[Q.bakaze] + '場'));
+  center.appendChild(el('ba-self', opts.showSelf ? '自分＝' + JP[Q.jikaze] + '家' : ''));
+  seats.appendChild(center);
+
+  const mine = el('mine');
+  mine.appendChild(el('oya-self', Q.seatOfOya === 0 ? '親（＝東）' : ''));
+  const hand = el('hand');
+  for (const t of handTiles(Q.hand)) hand.appendChild(tileEl(t));
+  if (opts.win && Q.answerTile != null) hand.appendChild(tileEl(Q.answerTile, 'win drawn'));
+  mine.appendChild(hand);
+  seats.appendChild(mine);
+
+  wrap.appendChild(seats);
+  return wrap;
+}
+function renderTable(){
+  const host = $('tableHost');
+  host.textContent = '';
+  host.appendChild(tableEl({ showSelf: isDone() }));
+}
+
+/* ---------- 成績 ---------- */
+function renderStats(){
+  const pct = (n,d) => d ? Math.round(n/d*100) + '%' : '—';
+  $('stats').innerHTML = '';
+  const cells = [
+    ['解いた数', agg.total + '', '問'],
+    ['風あて',   pct(agg.s0, agg.windN), ''],
+    ['聴牌判定', pct(agg.s1, agg.total), ''],
+    ['待ち当て',  pct(agg.s2, agg.tenpaiN), ''],
+    ['役当て',    pct(agg.s3, agg.tenpaiN), '']
+  ];
+  for (const [k,v,u] of cells){
+    const c = el('stat');
+    c.appendChild(el('k', k));
+    const val = el('v'); val.textContent = v;
+    if (u){ const s = document.createElement('small'); s.textContent = u; val.appendChild(s); }
+    c.appendChild(val);
+    $('stats').appendChild(c);
+  }
+}
+
+/* ---------- 設問の描画（下へ積み上げる） ---------- */
+function ansLine(build){
+  const d = el('ansline');
+  d.appendChild(el('anslabel', '正解'));
+  build(d);
+  return d;
+}
+function verdictLine(ok, dk){
+  if (dk){
+    const d = el('vline dk');
+    d.appendChild(el('vtxt', '分からない'));
+    return d;
+  }
+  const d = el('vline ' + (ok ? 'ok' : 'ng'));
+  d.appendChild(el('vtxt', ok ? '◎正解！' : '不正解'));
+  return d;
+}
+/* 「分からない」のボタン */
+function dunnoBtn(onPick){
+  const b = document.createElement('button');
+  b.className = 'btn dunno'; b.textContent = '分からない';
+  b.onclick = () => { if (tooSoon()) return; onPick(); };
+  return b;
+}
+
+const WINDS = [27, 28, 29, 30];               // 東 南 西 北
+const windOk = () => said0.ba === P.bakaze && said0.ji === P.jikaze;
+
+function q0Block(){
+  const done = score.s0 !== null;
+  const blk = el('qblock');
+  blk.appendChild(el('q', '【問１】この局の風は？'));
+
+  const row = (label, key, ans) => {
+    const line = el('windrow');
+    line.appendChild(el('windlab', label));
+    const box = el('yaku-chips');
+    for (const w of WINDS){
+      const b = document.createElement('button');
+      b.className = 'chip wind';
+      b.textContent = JP[w];
+      b.setAttribute('aria-pressed', said0[key] === w ? 'true' : 'false');
+      if (done) b.disabled = true;
+      else b.onclick = () => {
+        said0[key] = w;
+        box.querySelectorAll('.chip').forEach((n, i) =>
+          n.setAttribute('aria-pressed', said0[key] === WINDS[i] ? 'true' : 'false'));
+        /* 両方そろった時点で判定する */
+        if (said0.ba !== null && said0.ji !== null){
+          score.s0 = windOk();
+          render(true);
+        }
+      };
+      box.appendChild(b);
+    }
+    line.appendChild(box);
+    return line;
+  };
+  blk.appendChild(row('場の風', 'ba'));
+  blk.appendChild(row('自分の風', 'ji'));
+
+  if (done){
+    blk.appendChild(verdictLine(score.s0, dunno.s0));
+    if (!score.s0) blk.appendChild(ansLine(d => d.appendChild(
+      el('ansval', '場の風 ' + JP[P.bakaze] + '　自分の風 ' + JP[P.jikaze]))));
+  } else {
+    const act = el('actions');
+    act.appendChild(dunnoBtn(() => {
+      said0 = { ba:null, ji:null };
+      dunno.s0 = true; score.s0 = false; render(true);
+    }));
+    blk.appendChild(act);
+  }
+  return blk;
+}
+
+const Q1_OPTIONS = [
+  { key:'yaku',   label:'テンパイ（役あり）',   note:['どの牌であがっても役がつく'] },
+  { key:'noyaku', label:'テンパイ（役なし）',   note:['※ツモならあがれる','※リーチすればロンでもあがれる'] },
+  { key:'mixed',  label:'テンパイ（待ちによる）', note:['役がつく牌とつかない牌がある','※ツモならあがれる','※リーチすればロンでもあがれる'] },
+  { key:'noten',  label:'テンパイしていない',   note:[] }
+];
+const q1Answer = () => !P.tenpai ? 'noten' : P.yakuKind;
+const q1Label  = k => { const o = Q1_OPTIONS.find(x => x.key === k); return o ? o.label : '—'; };
+
+function q1Block(){
+  const done = score.s1 !== null;
+  const blk = el('qblock');
+  blk.appendChild(el('q', '【問２】聴牌していますか？'));
+  const ch = el('choices');
+  for (const o of Q1_OPTIONS){
+    const b = document.createElement('button');
+    b.className = 'btn two' + (said1 === o.key ? ' on' : '');
+    b.appendChild(el('blabel', o.label));
+    for (const n of o.note) b.appendChild(el('bnote', n));
+    if (done) b.disabled = true;
+    else b.onclick = () => {
+      if (tooSoon()) return;
+      said1 = o.key; score.s1 = (o.key === q1Answer());
+      render(true);
+    };
+    ch.appendChild(b);
+  }
+  if (!done){
+    const b = document.createElement('button');
+    b.className = 'btn two dunno';
+    b.appendChild(el('blabel', '分からない'));
+    b.onclick = () => {
+      if (tooSoon()) return;
+      said1 = null; dunno.s1 = true; score.s1 = false; render(true);
+    };
+    ch.appendChild(b);
+  }
+  blk.appendChild(ch);
+  if (done){
+    blk.appendChild(verdictLine(score.s1, dunno.s1));
+    if (!score.s1) blk.appendChild(ansLine(d => d.appendChild(el('ansval', q1Label(q1Answer())))));
+  }
+  return blk;
+}
+
+function q2Block(){
+  const done = score.s2 !== null;
+  const blk = el('qblock');
+  blk.appendChild(el('q', '【問３】待ちはどれですか？'));
+  blk.appendChild(el('q-note', '和了牌になるものを、すべて選んでください。'));
+
+  /* 上までスクロールしなくて済むよう、卓をここにも出す */
+  blk.appendChild(tableEl({ inline:true, showSelf: isDone() }));
+
+  const box = el('picker');
+  for (const [a, b] of [[0,9],[9,18],[18,27],[27,34]]){
+    const row = el('prow2');
+    for (let i=a;i<b;i++){
+      const btn = document.createElement('button');
+      btn.className = 'pick';
+      btn.setAttribute('aria-pressed', picked.has(i) ? 'true' : 'false');
+      btn.setAttribute('aria-label', JP[i]);
+      btn.appendChild(tileEl(i));
+      if (done) btn.disabled = true;
+      else btn.onclick = () => {
+        picked.has(i) ? picked.delete(i) : picked.add(i);
+        btn.setAttribute('aria-pressed', picked.has(i) ? 'true' : 'false');
+      };
+      row.appendChild(btn);
+    }
+    box.appendChild(row);
+  }
+  blk.appendChild(box);
+
+  if (done){
+    blk.appendChild(verdictLine(score.s2, dunno.s2));
+    if (!score.s2) blk.appendChild(ansLine(d => {
+      const g = el('grp');
+      for (const t of P.waits) g.appendChild(tileEl(t));
+      d.appendChild(g);
+    }));
+  } else {
+    const act = el('actions');
+    const go = document.createElement('button');
+    go.className = 'btn primary'; go.textContent = 'これで決定';
+    go.onclick = () => {
+      if (tooSoon()) return;
+      const want = new Set(P.waits);
+      score.s2 = picked.size === want.size && [...picked].every(t => want.has(t));
+      render(true);
+    };
+    act.appendChild(go);
+    act.appendChild(dunnoBtn(() => {
+      picked = new Set(); dunno.s2 = true; score.s2 = false; render(true);
+    }));
+    blk.appendChild(act);
+  }
+  return blk;
+}
+
+function q3Block(){
+  const done = score.s3 !== null;
+  const blk = el('qblock');
+  blk.appendChild(el('q', '【問４】この牌であがったとき、つく役は？'));
+
+  /* 和了図。役牌の判定に風が要るので、卓ごと出す */
+  blk.appendChild(tableEl({ inline:true, win:true, showSelf: isDone() }));
+
+  blk.appendChild(el('riichiline', P.riichi ? 'リーチをした上で' : 'リーチをしないで'));
+
+  const line = el('winline');
+  line.appendChild(tileEl(P.answerTile, 'win'));
+  line.appendChild(el('wl-ji', 'を'));
+  line.appendChild(el('wl-key', P.winBy === 'tsumo' ? 'ツモ' : 'ロン'));
+  line.appendChild(el('wl-ji', 'であがった'));
+  blk.appendChild(line);
+
+  const opts = yakuOptions();
+  const chips = el('yaku-chips');
+  for (const o of opts){
+    const b = document.createElement('button');
+    b.className = 'chip'; b.textContent = o.label;
+    b.setAttribute('aria-pressed', pickedYaku.has(o.key) ? 'true' : 'false');
+    if (done) b.disabled = true;
+    else b.onclick = () => {
+      if (o.key === 'nowin'){                 /* あがれない … 単独 */
+        const on = pickedYaku.has('nowin');
+        pickedYaku.clear();
+        if (!on) pickedYaku.add('nowin');
+      } else {                                  /* 他は重ねて選べる */
+        pickedYaku.delete('nowin');
+        pickedYaku.has(o.key) ? pickedYaku.delete(o.key) : pickedYaku.add(o.key);
+      }
+      chips.querySelectorAll('.chip').forEach((n,i) => n.setAttribute('aria-pressed', pickedYaku.has(opts[i].key) ? 'true' : 'false'));
+    };
+    chips.appendChild(b);
+  }
+  blk.appendChild(chips);
+
+  if (done){
+    blk.appendChild(verdictLine(score.s3, dunno.s3));
+    if (!score.s3) blk.appendChild(ansLine(d => {
+      const box = el('anschips');
+      for (const k of wantKeys()){
+        /* 選び忘れた役は大きく目立たせる */
+        const miss = !dunno.s3 && !pickedYaku.has(k);
+        const chip = el('anschip' + (miss ? ' miss' : ''));
+        if (miss) chip.appendChild(el('miss-tag', 'もれ'));
+        chip.appendChild(el('anschip-l', yakuLabel(k)));
+        box.appendChild(chip);
+      }
+      d.appendChild(box);
+    }));
+  } else {
+    const act = el('actions');
+    const go = document.createElement('button');
+    go.className = 'btn primary'; go.textContent = 'これで決定';
+    go.onclick = () => {
+      if (tooSoon()) return;
+      const want = new Set(wantKeys());
+      score.s3 = pickedYaku.size === want.size && [...pickedYaku].every(k => want.has(k));
+      render(true);
+    };
+    act.appendChild(go);
+    act.appendChild(dunnoBtn(() => {
+      pickedYaku = new Set(); dunno.s3 = true; score.s3 = false; render(true);
+    }));
+    blk.appendChild(act);
+  }
+  return blk;
+}
+
+function explainBlock(){
+  const blk = el('qblock');
+  const act = el('actions');
+  const next = document.createElement('button');
+  next.className = 'btn primary'; next.textContent = '次の問題';
+  next.onclick = () => { if (tooSoon()) return; newProblem(); };
+  act.appendChild(next);
+
+  const mk = document.createElement('button');
+  mk.className = 'btn mark' + (curRec && curRec.mark ? ' on' : '');
+  mk.textContent = curRec && curRec.mark ? '目印つき' : '目印をつける';
+  mk.onclick = () => {
+    if (!curRec) return;
+    curRec.mark = !curRec.mark;
+    mk.classList.toggle('on', curRec.mark);
+    mk.textContent = curRec.mark ? '目印つき' : '目印をつける';
+    renderSaveState();
+    if (storeMode === 'db' && curIdx >= 0) dbWrite(curIdx);
+  };
+  act.appendChild(mk);
+
+  blk.appendChild(act);
+  return blk;
+}
+
+/* 3問ぶん終わったか（外したところで打ち切る） */
+function isDone(){
+  if (score.s0 === null) return false;
+  if (score.s1 === null) return false;
+  if (!P.tenpai) return true;          // テンパイしていない手は1問で終わり
+  if (score.s2 === null) return false;
+  return score.s3 !== null;
+}
+
+function scrollToLast(){
+  const kids = $('panel').children;
+  const last = kids[kids.length - 1];
+  if (!last) return;
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  try { last.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'nearest' }); } catch (e) {}
+}
+
+function render(scroll){
+  lastRender = Date.now();
+  renderTable();
+  const p = $('panel'); p.textContent = '';
+  p.appendChild(q0Block());
+  if (score.s0 !== null) p.appendChild(q1Block());
+  /* 聴牌の手は、外しても最後まで答える */
+  if (P.tenpai && score.s1 !== null) p.appendChild(q2Block());
+  if (P.tenpai && score.s2 !== null) p.appendChild(q3Block());
+  if (isDone()){
+    if (!curRec) record();          // 解き終えた時点で1問ぶん積む
+    p.appendChild(explainBlock());
+  }
+  if (scroll) setTimeout(scrollToLast, 30);
+}
+
+function reasonFor(y, r, c14){
+  if (y.key === 'tsumo')  return '門前のまま自分でツモった。それだけで1翻。';
+  if (y.key === 'tanyao') return '1・9・字牌が1枚も入っていません。';
+  if (y.key === 'pinfu')  return '4面子すべて順子、雀頭が役牌でなく、待ちが両面。';
+  if (y.key === 'iipeiko')return '同じ順子が2組そろっています。';
+  if (y.key === 'honitsu')return '数牌が1種類だけ、あとは字牌。';
+  if (y.key === 'yakuhai'){
+    const n = y.name.replace(/^役牌（|）$/g,'');
+    if (n.startsWith('場風')) return '場風の刻子。';
+    if (n.startsWith('自風')) return '自風の刻子。';
+    return n + 'は三元牌なので、刻子にすればそれだけで役。';
+  }
+  return '';
+}
+
+/* ---------- 記録 ----------
+   保存先は「どう開かれたか」で自動的に決まる。
+     db   … アーティファクトとして開かれたとき。1問ごとに自動保存
+     file … HTMLファイルとして開かれたとき。「記録を保存」で書き出す
+   どちらの場合もブラウザの保存領域（localStorage 等）は使わない。 */
+const MARK  = /(<script id="mj-records"[^>]*>)[\s\S]*?(<\/script>)/;
+const MARK2 = /(<script id="mj-settings"[^>]*>)[\s\S]*?(<\/script>)/;
+const PRISTINE = '<!doctype html>\n' + document.documentElement.outerHTML;
+let records = [];
+let savedCount = 0;
+let curRec = null;      // いま解いている問題の記録
+let curIdx = -1;        // それが records の何番目か
+
+let storeMode = 'file';                 // 'file' | 'db'
+let DB = null, dbBusy = false, dbFailed = false;
+const PAGE = 100;                       // 1ドキュメントにまとめる問題数
+const pagePath = n => 'records/p' + String(n).padStart(4, '0');
+
+function applySettings(o){
+  if (!o || typeof o !== 'object') return;
+  if (o.on && typeof o.on === 'object')
+    for (const k in settings.on) if (typeof o.on[k] === 'boolean') settings.on[k] = o.on[k];
+  if (typeof o.notenRate === 'number' && o.notenRate >= 0 && o.notenRate <= 1)
+    settings.notenRate = o.notenRate;
+  /* 上限を超えていたら、並び順の先頭から MAX_ON 種類だけ残す */
+  let n = 0;
+  for (const y of ALL_YAKU){
+    if (!settings.on[y.key]) continue;
+    n++; if (n > MAX_ON) settings.on[y.key] = false;
+  }
+}
+function loadSettings(){
+  try {
+    const raw = document.getElementById('mj-settings').textContent.trim();
+    applySettings(raw ? JSON.parse(raw) : null);
+  } catch (e) {}
+}
+function saveSettings(){
+  if (storeMode === 'db' && DB){
+    DB.doc('config/settings').set({ on: settings.on, notenRate: settings.notenRate })
+      .catch(() => {});
+  } else {
+    savedJson = '';                    // ファイル版は「未保存」に落とす
+    renderSaveState();
+  }
+}
+function loadRecords(){
+  try {
+    const raw = document.getElementById('mj-records').textContent.trim();
+    const a = raw ? JSON.parse(raw) : [];
+    records = Array.isArray(a) ? a : [];
+  } catch (e) { records = []; }
+  savedCount = records.length;
+  savedJson = JSON.stringify(records);
+  recomputeAgg();
+}
+function recomputeAgg(){
+  agg = { total:0, windN:0, s0:0, s1:0, tenpaiN:0, s2:0, s3:0 };
+  for (const r of records){
+    agg.total++;
+    if (r.ok0 != null){ agg.windN++; if (r.ok0) agg.s0++; }
+    if (r.ok && r.ok[0]) agg.s1++;
+    if (r.kind !== 'noten'){
+      agg.tenpaiN++;
+      if (r.ok && r.ok[1]) agg.s2++;
+      if (r.ok && r.ok[2]) agg.s3++;
+    }
+  }
+}
+/* 1問ぶんを記録に積む。手牌と和了牌を残しておけば、
+   待ちの形や役はあとから判定エンジンで出し直せる。 */
+function record(){
+  curRec = {
+    at:   new Date().toISOString(),
+    hand: handTiles(P.hand),
+    ba:   P.bakaze, ji: P.jikaze, oya: P.seatOfOya,
+    by:   P.winBy,
+    ri:   !!P.riichi,
+    w:    [said0.ba, said0.ji],
+    ok0:  score.s0,
+    kind: q1Answer(),
+    waits: P.waits.slice(),
+    win:  P.answerTile,
+    yaku: P.answerKeys.slice(),
+    a1:   said1,
+    a2:   [...picked],
+    a3:   [...pickedYaku],
+    ok:   [score.s1, score.s2, score.s3],
+    dk:   [dunno.s0, dunno.s1, dunno.s2, dunno.s3],
+    mark: false
+  };
+  records.push(curRec);
+  curIdx = records.length - 1;
+  recomputeAgg();
+  renderStats();
+  renderTabs();
+  renderSaveState();
+  if (storeMode === 'db') dbWrite(curIdx);
+}
+let savedJson = '[]';
+function renderSaveState(){
+  const tag = $('unsaved'), btn = $('save');
+  const marked = records.filter(r => r.mark).length;
+
+  if (storeMode === 'db'){                 /* アーティファクト … 自動保存 */
+    btn.hidden = true;
+    let t = dbFailed ? '保存できませんでした'
+          : dbBusy   ? '保存中…'
+          : records.length ? '自動保存' : '';
+    if (marked) t += '　目印 ' + marked + '問';
+    tag.textContent = t;
+    tag.classList.toggle('pending', dbFailed || dbBusy);
+    return;
+  }
+                                           /* HTMLファイル … 手動保存 */
+  const dirty  = JSON.stringify(records) !== savedJson;
+  const fresh  = records.length - savedCount;      // 保存後に増えた問題数
+  let txt = '';
+  if (records.length){
+    txt = !dirty ? '保存済み'
+        : fresh > 0 ? '未保存 ' + fresh + '問'
+        : '未保存の変更あり';
+    if (marked) txt += '　目印 ' + marked + '問';
+  }
+  tag.textContent = txt;
+  tag.classList.toggle('pending', dirty);
+  btn.disabled = !dirty;
+}
+
+/* ---------- アーティファクトの記録置き場 ----------
+   1ドキュメントにPAGE問ずつ束ねて置く。問題ごとに1件作ると
+   ドキュメント数の上限に当たるため。 */
+async function dbWrite(from){
+  if (!DB || !records.length) return;
+  const first = Math.floor(from / PAGE);
+  const last  = Math.floor((records.length - 1) / PAGE);
+  dbBusy = true; renderSaveState();
+  try {
+    for (let n = first; n <= last; n++){
+      await DB.doc(pagePath(n)).set({ items: records.slice(n * PAGE, (n + 1) * PAGE) });
+    }
+    savedCount = records.length;
+    savedJson  = JSON.stringify(records);
+    dbFailed = false;
+  } catch (e) {
+    dbFailed = true;
+  }
+  dbBusy = false; renderSaveState();
+}
+
+/* アーティファクトとして開かれていれば db に切り替える。
+   使えるかどうかは開いてみるまで分からないので、画面は先に出しておき、
+   分かった時点で切り替える。待っている間に解いたぶんは取りこぼさない。 */
+async function initStore(){
+  if (!(window.claude && typeof window.claude.use === 'function')) return;
+  let db = null;
+  try { db = await window.claude.use('db'); } catch (e) { db = null; }
+  if (!db){ $('save').hidden = false; renderSaveState(); return; }
+
+  DB = db; storeMode = 'db';
+  renderSaveState();
+
+  try {
+    const cs = await DB.doc('config/settings').get();
+    if (cs.exists) applySettings(cs.data());
+  } catch (e) {}
+
+  let remote = [];
+  try {
+    const snap = await DB.collection('records').get();
+    for (const d of snap.docs){
+      const b = d.data();
+      if (b && Array.isArray(b.items)) remote = remote.concat(b.items);
+    }
+  } catch (e) { dbFailed = true; }
+
+  const local = records;                  // 読み込みを待つ間に解いたぶん
+  records = remote.concat(local);
+  if (curRec) curIdx = records.indexOf(curRec);
+  recomputeAgg();
+  renderStats();
+  renderTab();
+
+  renderFoot();
+  if (score.s0 === null) newProblem();        // まだ答えていなければ、読み込んだ設定で作り直す
+  if (local.length){
+    await dbWrite(remote.length);
+  } else {
+    savedCount = records.length;
+    savedJson  = JSON.stringify(records);
+    renderSaveState();
+  }
+}
+function saveFile(){
+  if (!MARK.test(PRISTINE)){
+    alert('記録を書き込む場所が見つかりません。ファイルが壊れている可能性があります。');
+    return;
+  }
+  const json = JSON.stringify(records).replace(/</g, '\\u003c');
+  const conf = JSON.stringify({ on: settings.on, notenRate: settings.notenRate }).replace(/</g, '\\u003c');
+  const html = PRISTINE.replace(MARK, (m, head, tail) => head + json + tail)
+                       .replace(MARK2, (m, head, tail) => head + conf + tail);
+  const url = URL.createObjectURL(new Blob([html], { type:'text/html' }));
+  const a = document.createElement('a');
+  a.href = url; a.download = 'tenpai-knock.html';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 3000);
+  savedCount = records.length;
+  savedJson = JSON.stringify(records);
+  renderSaveState();
+}
+
+/* ==========================================================
+   タブ・記録一覧・集計
+   ========================================================== */
+let tab = 'drill';                       // 'drill' | 'list' | 'agg'
+let listShown = 50;                      // 一覧に出している件数
+let aggOpen = null;                      // 集計で開いている行
+let aggShown = 50;                       // その行で出している件数
+let aggOpenRec = -1;                     // その中で開いている記録
+const TABS = [['drill','練習'], ['list','記録'], ['agg','集計'], ['conf','設定']];
+
+function renderTabs(){
+  const nav = $('tabs'); nav.textContent = '';
+  for (const [k, label] of TABS){
+    const b = document.createElement('button');
+    b.className = 'tab' + (tab === k ? ' on' : '');
+    b.textContent = label;
+    if (k === 'list' && records.length){
+      const n = document.createElement('span');
+      n.className = 'n'; n.textContent = records.length;
+      b.appendChild(n);
+    }
+    b.onclick = () => { tab = k; listShown = 50; renderTab(); };
+    nav.appendChild(b);
+  }
+}
+function renderTab(){
+  renderTabs();
+  $('drill').hidden    = tab !== 'drill';
+  $('listView').hidden = tab !== 'list';
+  $('aggView').hidden  = tab !== 'agg';
+  $('confView').hidden = tab !== 'conf';
+  $('foot').hidden     = tab !== 'drill';
+  if (tab === 'list') renderList();
+  if (tab === 'agg')  renderAgg();
+  if (tab === 'conf') renderConf();
+}
+
+/* 記録から、卓を描くのに使える形を組み立て直す */
+function recProblem(r){
+  const hand = new Array(34).fill(0);
+  for (const t of (r.hand || [])) hand[t]++;
+  return {
+    hand, bakaze:r.ba, jikaze:r.ji, seatOfOya:r.oya, winBy:r.by,
+    tenpai: r.kind !== 'noten', yakuKind: r.kind,
+    waits: r.waits || [], answerTile: r.win == null ? null : r.win,
+    answerKeys: r.yaku || []
+  };
+}
+const yakuLabel = k => yakuLabelOf(k);
+function tileRow(list){
+  const g = el('grp');
+  for (const t of list) g.appendChild(tileEl(t));
+  return g;
+}
+const hhmm = iso => {
+  const d = new Date(iso);
+  return isNaN(d) ? '' : (d.getMonth()+1) + '/' + d.getDate() + ' ' +
+    String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+};
+const ymd = iso => {
+  const d = new Date(iso);
+  return isNaN(d) ? '' : d.getFullYear() + '-' +
+    String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+};
+
+/* ---------- 記録一覧 ---------- */
+let openRec = -1;                        // 開いている記録の番号
+
+function markEl(v, dk){
+  if (dk) return el('mk q', '？');
+  return el('mk ' + (v === true ? 'o' : v === false ? 'x' : ''),
+            v === true ? '●' : v === false ? '×' : '−');
+}
+const dkOf = (r, i) => !!(r.dk && r.dk[i]);
+function recDetail(r, i){
+  const box = el('rec-open');
+  const Q = recProblem(r);
+  box.appendChild(tableEl({ p:Q, inline:true, win:true, showSelf:true }));
+
+  const ans = el('rec-ans');
+  const line = (label, build) => {
+    const row = el('row');
+    row.appendChild(el('lab', label));
+    build(row);
+    ans.appendChild(row);
+  };
+  if (r.ok0 != null){
+    const w = r.w || [null, null];
+    const txt = a => '場 ' + (a[0] == null ? '—' : JP[a[0]]) + '／自 ' + (a[1] == null ? '—' : JP[a[1]]);
+    line('風', row => {
+      row.appendChild(dkOf(r,0) ? el('dk', '分からない') : el(r.ok0 ? 'ok' : 'ng', txt(w)));
+      if (!r.ok0) row.appendChild(el('ok', '→ ' + txt([r.ba, r.ji])));
+    });
+  }
+  line('聴牌', row => {
+    row.appendChild(dkOf(r,1) ? el('dk', '分からない')
+                              : el(r.ok[0] ? 'ok' : 'ng', q1Label(r.a1)));
+    if (!r.ok[0]) row.appendChild(el('ok', '→ ' + q1Label(r.kind)));
+  });
+  if (r.kind !== 'noten'){
+    line('待ち', row => {
+      if (r.ok[1]) row.appendChild(tileRow(r.waits));
+      else if (dkOf(r,2)){
+        row.appendChild(el('dk', '分からない'));
+        row.appendChild(el('ok', '正解'));  row.appendChild(tileRow(r.waits));
+      } else {
+        row.appendChild(el('ng', '答え'));  row.appendChild(tileRow(r.a2 || []));
+        row.appendChild(el('ok', '正解'));  row.appendChild(tileRow(r.waits));
+      }
+    });
+    const said = (r.a3 || []).map(yakuLabel).join('・') || '（選択なし）';
+    const real = realKeys(r).map(yakuLabel).join('・');
+    line('役', row => {
+      row.appendChild(dkOf(r,3) ? el('dk', '分からない')
+                                : el(r.ok[2] ? 'ok' : 'ng', said));
+      if (!r.ok[2]) row.appendChild(el('ok', '→ ' + real));
+    });
+  }
+  box.appendChild(ans);
+  return box;
+}
+/* ●×の見出し。sticky にするかどうかだけ切り替える */
+function recHead(sticky, label){
+  const head = el('rec-head' + (sticky ? '' : ' flat'));
+  head.appendChild(el('sp', label));
+  const mh = el('mkhead');
+  for (const t of ['風','聴牌','待ち','役']) mh.appendChild(el('mkh', t));
+  head.appendChild(mh);
+  head.appendChild(el('rec-flag', ''));
+  return head;
+}
+const REC_NOTE = '\u25cf正解\u3000\u00d7不正解\u3000？分からない\u3000\u2212その設問なし（テンパイしていない手は待ちと役を聞きません）。行を押すと中身が開きます。';
+
+/* 記録1件ぶんの行。一覧からも集計の中からも使う */
+function recBlock(i, openIdx, onToggle){
+  const r = records[i];
+  const wrap = el('rec' + (openIdx === i ? ' open' : ''));
+
+  const row = document.createElement('button');
+  row.className = 'rec-row';
+  const no = el('rec-no');
+  const b = document.createElement('b'); b.textContent = (i + 1);
+  no.appendChild(b); no.appendChild(document.createTextNode(hhmm(r.at)));
+  row.appendChild(no);
+
+  const hand = el('rec-hand');
+  for (const t of (r.hand || [])) hand.appendChild(tileEl(t));
+  if (r.win != null) hand.appendChild(tileEl(r.win, 'win drawn'));
+  row.appendChild(hand);
+
+  const mk = el('marks');
+  mk.appendChild(markEl(r.ok0 == null ? null : !!r.ok0, dkOf(r,0)));
+  mk.appendChild(markEl(r.ok ? r.ok[0] : null, dkOf(r,1)));
+  mk.appendChild(markEl(r.ok ? r.ok[1] : null, dkOf(r,2)));
+  mk.appendChild(markEl(r.ok ? r.ok[2] : null, dkOf(r,3)));
+  row.appendChild(mk);
+  row.appendChild(el('rec-flag', r.mark ? '\u2605' : ''));
+
+  row.onclick = () => onToggle(i);
+  wrap.appendChild(row);
+  if (openIdx === i) wrap.appendChild(recDetail(r, i));
+  return wrap;
+}
+
+function renderList(){
+  const v = $('listView'); v.textContent = '';
+  if (!records.length){ v.appendChild(el('empty', 'まだ記録がありません。')); return; }
+
+  v.appendChild(recHead(true, '解いた問題（新しい順）'));
+
+  const n = Math.min(listShown, records.length);
+  for (let k = 0; k < n; k++){
+    const i = records.length - 1 - k;         // 新しいものから
+    v.appendChild(recBlock(i, openRec, j => { openRec = (openRec === j ? -1 : j); renderList(); }));
+  }
+  v.appendChild(el('rec-note', REC_NOTE));
+
+  if (n < records.length){
+    const more = document.createElement('button');
+    more.className = 'btn more';
+    more.textContent = 'さらに表示（残り ' + (records.length - n) + ' 問）';
+    more.onclick = () => { listShown += 50; renderList(); };
+    v.appendChild(more);
+  }
+}
+
+/* ---------- 集計 ---------- */
+function pctBar(ok, n){
+  const td = document.createElement('td'); td.className = 'p';
+  const bar = el('bar');
+  const track = el('bar-track');
+  const fill = el('bar-fill');
+  fill.style.width = (n ? Math.round(ok / n * 100) : 0) + '%';
+  track.appendChild(fill);
+  bar.appendChild(track);
+  bar.appendChild(el('bar-val', n ? Math.round(ok / n * 100) + '%' : '—'));
+  td.appendChild(bar);
+  return td;
+}
+function aggTable(sec, head, rows){
+  const t = document.createElement('table');
+  const tr = document.createElement('tr');
+  for (const h of head){ const th = document.createElement('th'); th.textContent = h; tr.appendChild(th); }
+  t.appendChild(tr);
+  for (const row of rows){
+    const key = sec + '/' + row.label;
+    const open = (aggOpen === key);
+    const line = document.createElement('tr');
+    const c0 = document.createElement('td');
+    c0.textContent = (row.n && row.test ? (open ? '▾ ' : '▸ ') : '') + row.label;
+    if (!row.n) c0.className = 'dim';
+    line.appendChild(c0);
+    const c1 = document.createElement('td'); c1.className = 'n';
+    c1.textContent = row.n ? row.ok + '問／' + row.n + '問中' : '—';
+    line.appendChild(c1);
+    const c2 = document.createElement('td'); c2.className = 'n dim';
+    c2.textContent = row.dk ? row.dk + '問' : (row.n ? '—' : '');
+    line.appendChild(c2);
+    line.appendChild(pctBar(row.ok, row.n));
+
+    /* 行を押すと、その下に該当問題を開く（画面は移らない） */
+    if (row.n && row.test){
+      line.className = 'link' + (open ? ' on' : '');
+      line.onclick = () => {
+        if (open) aggOpen = null;
+        else { aggOpen = key; aggShown = 50; aggOpenRec = -1; }
+        renderAgg();
+      };
+    }
+    t.appendChild(line);
+    if (open) t.appendChild(aggExpand(row));
+  }
+  return t;
+}
+
+/* 集計の行の下に差し込む、該当問題の一覧 */
+function aggExpand(row){
+  const tr = document.createElement('tr'); tr.className = 'expand';
+  const td = document.createElement('td'); td.colSpan = 4;
+
+  const hits = [];
+  for (let i = 0; i < records.length; i++) if (row.test(records[i])) hits.push(i);
+
+  td.appendChild(recHead(false, (row.name || row.label) + ' の問題　' + hits.length + '問'));
+  const n = Math.min(aggShown, hits.length);
+  for (let k = 0; k < n; k++){
+    const i = hits[hits.length - 1 - k];
+    td.appendChild(recBlock(i, aggOpenRec, j => {
+      aggOpenRec = (aggOpenRec === j ? -1 : j); renderAgg();
+    }));
+  }
+  td.appendChild(el('rec-note', REC_NOTE));
+  if (n < hits.length){
+    const more = document.createElement('button');
+    more.className = 'btn more';
+    more.textContent = 'さらに表示（残り ' + (hits.length - n) + ' 問）';
+    more.onclick = ev => { ev.stopPropagation(); aggShown += 50; renderAgg(); };
+    td.appendChild(more);
+  }
+  tr.appendChild(td);
+  return tr;
+}
+/* 記録から待ちの形を出し直す */
+function shapeOf(r){
+  if (r.kind === 'noten' || r.win == null) return '';
+  const c = new Array(34).fill(0);
+  for (const t of (r.hand || [])) c[t]++;
+  c[r.win]++;
+  try { return waitShape(c, r.win, r.ba, r.ji) || ''; } catch (e) { return ''; }
+}
+function renderAgg(){
+  const v = $('aggView'); v.textContent = '';
+  if (!records.length){ v.appendChild(el('empty', 'まだ記録がありません。')); return; }
+  const h = t => { const x = document.createElement('h2'); x.textContent = t; return x; };
+
+  /* 1問目 … 風 */
+  const winds = [[27,'東家'],[28,'南家'],[29,'西家'],[30,'北家']];
+  const windRecs = records.filter(r => r.ok0 != null);
+  if (windRecs.length){
+    v.appendChild(h('1問目 ─ 自分の風ごとの正答率'));
+    v.appendChild(aggTable('wind', ['自分の風','正解／出題','分からない','正答率'], winds.map(([w,label]) => {
+      const test = r => r.ok0 != null && r.ji === w;
+      const rs = windRecs.filter(test);
+      return { label, name: '自分の風 ' + label, n: rs.length,
+               ok: rs.filter(r => r.ok0).length, dk: rs.filter(r => dkOf(r,0)).length, test };
+    })));
+  }
+
+  /* 手の種類別 */
+  const kinds = [['yaku','テンパイ（役あり）'],['noyaku','テンパイ（役なし）'],
+                 ['mixed','テンパイ（待ちによる）'],['noten','テンパイしていない']];
+  v.appendChild(h((windRecs.length ? '2問目' : '1問目') + ' ─ 手の種類ごとの正答率'));
+  v.appendChild(aggTable('kind', ['種類','正解／出題','分からない','正答率'], kinds.map(([k,label]) => {
+    const test = r => r.kind === k;
+    const rs = records.filter(test);
+    return { label, n: rs.length, ok: rs.filter(r => r.ok && r.ok[0]).length,
+             dk: rs.filter(r => dkOf(r,1)).length, test };
+  })));
+
+  /* 待ちの形別（2問目） */
+  const shapes = ['両面待ち','嵌張待ち','辺張待ち','シャンポン待ち','単騎待ち'];
+  const byShape = {};
+  for (const r of records){
+    if (r.kind === 'noten' || !r.ok || r.ok[1] == null) continue;
+    const sh = shapeOf(r); if (!sh) continue;
+    (byShape[sh] = byShape[sh] || {n:0, ok:0, dk:0});
+    byShape[sh].n++; if (r.ok[1]) byShape[sh].ok++; if (dkOf(r,2)) byShape[sh].dk++;
+  }
+  v.appendChild(h((windRecs.length ? '3問目' : '2問目') + ' ─ 待ちの形ごとの正答率'));
+  v.appendChild(aggTable('shape', ['待ちの形','正解／出題','分からない','正答率'], shapes.map(sh => ({
+    label: sh, n: (byShape[sh]||{}).n || 0, ok: (byShape[sh]||{}).ok || 0,
+    dk: (byShape[sh]||{}).dk || 0,
+    test: r => r.kind !== 'noten' && r.ok && r.ok[1] != null && shapeOf(r) === sh
+  }))));
+
+  /* 役別（3問目） */
+  const keys = ALL_YAKU.map(o => o.key).concat(['nowin']);
+  v.appendChild(h((windRecs.length ? '4問目' : '3問目') + ' ─ 役ごとの正答率（その役が正解に含まれる問題）'));
+  v.appendChild(aggTable('yaku', ['役','正解／出題','分からない','正答率'], keys.map(k => {
+    const test = r => {
+      if (r.kind === 'noten' || !r.ok || r.ok[2] == null) return false;
+      return realKeys(r).indexOf(k) >= 0;
+    };
+    const rs = records.filter(test);
+    return { label: yakuLabel(k), n: rs.length, ok: rs.filter(r => r.ok[2]).length,
+             dk: rs.filter(r => dkOf(r,3)).length, test };
+  }).filter(row => row.n > 0)));
+
+  /* 日ごと */
+  const byDay = {};
+  for (const r of records){
+    const d = ymd(r.at); if (!d) continue;
+    const o = byDay[d] = byDay[d] || {n:0, w:0, s0:0, s1:0, t:0, s2:0, s3:0};
+    o.n++; if (r.ok0 != null){ o.w++; if (r.ok0) o.s0++; }
+    if (r.ok && r.ok[0]) o.s1++;
+    if (r.kind !== 'noten'){ o.t++; if (r.ok && r.ok[1]) o.s2++; if (r.ok && r.ok[2]) o.s3++; }
+  }
+  const days = Object.keys(byDay).sort().reverse();
+  v.appendChild(h('日ごとの推移'));
+  const t = document.createElement('table');
+  const hr = document.createElement('tr');
+  for (const c of ['日付','問題数','風あて','聴牌判定','待ち当て','役当て']){
+    const th = document.createElement('th'); th.textContent = c; hr.appendChild(th);
+  }
+  t.appendChild(hr);
+  const pc = (a,b) => b ? Math.round(a/b*100) + '%' : '—';
+  for (const d of days){
+    const o = byDay[d], tr = document.createElement('tr');
+    const c0 = document.createElement('td'); c0.textContent = d; tr.appendChild(c0);
+    for (const val of [o.n + '問', pc(o.s0,o.w), pc(o.s1,o.n), pc(o.s2,o.t), pc(o.s3,o.t)]){
+      const td = document.createElement('td'); td.className = 'n'; td.textContent = val; tr.appendChild(td);
+    }
+    t.appendChild(tr);
+  }
+  v.appendChild(t);
+}
+
+function renderFoot(){
+  const on = ALL_YAKU.filter(o => settings.on[o.key]);
+  const names = on.map(o => o.label.replace(/（.*?）/g, '')).join('・');
+  const f = $('foot'); f.textContent = '';
+  if (!on.length){
+    f.appendChild(el('', '設定で役がひとつもONになっていません。'));
+    return;
+  }
+  f.appendChild(document.createTextNode('答えに使う役は '));
+  const b = document.createElement('b'); b.textContent = names;
+  f.appendChild(b);
+  f.appendChild(document.createTextNode(' の' + on.length + '種類。全問門前（鳴きなし）です。'));
+}
+
+/* ---------- 設定 ---------- */
+let confMsg = '';                        // 上限に当たったときの案内
+
+function renderConf(){
+  const v = $('confView'); v.textContent = '';
+  const cnt = onKeys().length;
+
+  const h = t => { const x = document.createElement('h2'); x.textContent = t; return x; };
+  v.appendChild(h('出題する役　' + cnt + '／' + MAX_ON + ' 種類'));
+  v.appendChild(el('conf-note',
+    'ONにした役だけを出題します。OFFの役がつく手は出てきません。' +
+    'メンゼンツモをOFFにすると全問ロン、リーチをOFFにすると全問リーチなしになります。' +
+    '選択肢が増えすぎないよう、ONにできるのは' + MAX_ON + '種類までです。'));
+  if (confMsg) v.appendChild(el('conf-warn', confMsg));
+
+  const box = el('conf-list');
+  for (const o of ALL_YAKU){
+    const on = settings.on[o.key];
+    const full = !on && cnt >= MAX_ON;
+    const b = document.createElement('button');
+    b.className = 'conf-item' + (on ? ' on' : '') + (full ? ' full' : '');
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    b.appendChild(el('ci-box', on ? '✓' : ''));
+    b.appendChild(el('ci-label', o.label));
+    b.onclick = () => {
+      if (full){ confMsg = MAX_ON + '種類までです。どれかをOFFにしてから選んでください。'; renderConf(); return; }
+      confMsg = '';
+      settings.on[o.key] = !on; saveSettings(); renderConf(); renderFoot();
+    };
+    box.appendChild(b);
+  }
+  v.appendChild(box);
+
+  const act = el('actions conf-act');
+  const all = document.createElement('button');
+  all.className = 'btn'; all.textContent = '上限までON（' + MAX_ON + '種類）';
+  all.onclick = () => {
+    ALL_YAKU.forEach((o, i) => { settings.on[o.key] = i < MAX_ON; });
+    confMsg = ''; saveSettings(); renderConf(); renderFoot();
+  };
+  const def = document.createElement('button');
+  def.className = 'btn'; def.textContent = 'はじめの9つに戻す';
+  def.onclick = () => {
+    for (const o of ALL_YAKU) settings.on[o.key] = DEFAULT_ON.indexOf(o.key) >= 0;
+    confMsg = ''; saveSettings(); renderConf(); renderFoot();
+  };
+  act.appendChild(all); act.appendChild(def);
+  v.appendChild(act);
+
+  v.appendChild(h('テンパイしていない手の割合'));
+  const rate = el('conf-rate');
+  for (const r of [0, 0.1, 0.25, 0.4, 0.5]){
+    const b = document.createElement('button');
+    b.className = 'chip' + (Math.abs(settings.notenRate - r) < 0.001 ? ' on' : '');
+    b.setAttribute('aria-pressed', Math.abs(settings.notenRate - r) < 0.001 ? 'true' : 'false');
+    b.textContent = Math.round(r*100) + '%';
+    b.onclick = () => { settings.notenRate = r; saveSettings(); renderConf(); };
+    rate.appendChild(b);
+  }
+  v.appendChild(rate);
+
+  v.appendChild(el('conf-note', '設定は次の問題から効きます。いまの問題はそのまま解けます。'));
+}
+
+/* ---------- 進行 ---------- */
+function newProblem(){
+  P = makeProblem();
+  if (!P){
+    const p = $('panel'); p.textContent = '';
+    p.appendChild(el('empty', 'この設定では問題を作れません。設定で役をもう少しONにしてください。'));
+    const act = el('actions');
+    const go = document.createElement('button');
+    go.className = 'btn primary'; go.textContent = '設定を開く';
+    go.onclick = () => { tab = 'conf'; renderTab(); };
+    act.appendChild(go); p.appendChild(act);
+    $('tableHost').textContent = '';
+    return;
+  }
+  said0 = { ba:null, ji:null };
+  said1 = null; picked = new Set(); pickedYaku = new Set();
+  score = { s0:null, s1:null, s2:null, s3:null };
+  dunno = { s0:false, s1:false, s2:false, s3:false };
+  curRec = null; curIdx = -1;
+  render();
+}
+
+loadSettings();
+loadRecords();
+renderFoot();
+renderStats();
+renderTab();
+renderSaveState();
+$('save').onclick = saveFile;
+/* アーティファクトの中では書き出しが使えない。db が使えるか分かるまで隠しておく */
+if (window.claude && typeof window.claude.use === 'function') $('save').hidden = true;
+newProblem();
+initStore();
+</script>
+</body>
+</html>
