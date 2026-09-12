@@ -374,6 +374,19 @@ button{font-family:var(--gothic);font-size:15.5px;cursor:pointer}
   color:var(--ink);
   border-radius:999px;padding:4px 13px;font-size:14px;font-weight:500;white-space:nowrap;
 }
+.modal-ov{
+  position:fixed;inset:0;z-index:50;padding:20px;
+  background:rgba(27,27,24,.45);display:flex;align-items:center;justify-content:center;
+}
+.modal{
+  background:var(--surface);border-radius:12px;padding:22px 22px 16px;
+  max-width:420px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,.22);
+}
+.modal-t{font-family:var(--mincho);font-size:19px;font-weight:600;margin-bottom:9px}
+.modal-b{
+  font-size:14px;color:var(--sub);line-height:1.7;margin-bottom:18px;
+  white-space:pre-line;word-break:break-all;
+}
 .prevline{
   display:flex;align-items:center;gap:9px;flex-wrap:wrap;
   margin:0 0 14px;padding:7px 12px;border-left:3px solid var(--line-2);
@@ -1352,7 +1365,7 @@ let score = { s0:null, s1:null, s2:null, s3:null, s4:null };
 let dunno = { s0:false, s1:false, s2:false, s3:false, s4:false };   // 「分からない」を選んだか
 let lastRender = 0;                 // 画面を描いた時刻
 const tooSoon = () => Date.now() - lastRender < 320;
-const APP_VERSION = '2026-09-12.9';       // version.json と合わせる
+const APP_VERSION = '2026-09-12.11';       // version.json と合わせる
 const SHOW_SAVE = false;                  // 手動の「記録を保存」を出すかどうか
 
 /* ドラ表示牌の小さな表示 */
@@ -2054,14 +2067,15 @@ function renderSaveState(){
   if (storeMode === 'fsa'){                /* ブラウザ版 … 記録ファイルに自動保存 */
     if (!FH){
       btn.hidden = false; btn.disabled = false;
-      btn.textContent = waitHandle ? '記録ファイルにつなぐ' : '記録の保存先をえらぶ';
+      btn.textContent = waitHandle ? '前回の記録に戻す' : '記録の保存先をえらぶ';
       btn.onclick = waitHandle ? fsaGrant : fsaPick;
-      tag.textContent = waitHandle ? '前回の記録ファイルがあります' : '';
-      tag.classList.toggle('pending', !!waitHandle);
+      tag.textContent = waitHandle ? '記録は保存されていません' : '記録は保存されていません';
+      tag.classList.add('pending');
       return;
     }
     btn.hidden = true;
     let t = fsaFailed ? '保存できませんでした' : fsaBusy ? '保存中…' : '自動保存';
+    t += '　' + FH.name;
     if (marked) t += '　目印 ' + marked + '問';
     tag.textContent = t;
     tag.classList.toggle('pending', fsaFailed || fsaBusy);
@@ -2130,6 +2144,63 @@ async function idbSet(k, v){
     const t = db.transaction('kv', 'readwrite').objectStore('kv').put(v, k);
     t.onsuccess = () => res(); t.onerror = () => rej(t.error);
   });
+}
+
+/* 画面中央のダイアログ。本文と2つのボタンだけ */
+function modal(title, body, yesLabel, onYes, noLabel, onNo){
+  const ov = el('modal-ov');
+  const card = el('modal');
+  card.appendChild(el('modal-t', title));
+  card.appendChild(el('modal-b', body));
+  const act = el('actions');
+  const close = () => ov.remove();
+
+  const yes = document.createElement('button');
+  yes.className = 'btn primary'; yes.textContent = yesLabel;
+  yes.onclick = () => { close(); onYes(); };
+
+  const no = document.createElement('button');
+  no.className = 'btn'; no.textContent = noLabel;
+  no.onclick = () => { close(); onNo(); };
+
+  act.appendChild(yes); act.appendChild(no);
+  card.appendChild(act);
+  ov.appendChild(card);
+  ov.onkeydown = (e) => { if (e.key === 'Escape') no.onclick(); };
+  document.body.appendChild(ov);
+  yes.focus();
+}
+
+/* 初回。記録を残すかどうかを案内する */
+function askSetup(){
+  modal('記録を残しますか',
+        '解いた記録と集計を、このパソコンのファイルに保存できます。\n'
+      + '保存先を一度えらぶと、あとは解くたびに自動で書き込まれます。\n'
+      + '次に開いたときも、その続きから始められます。',
+        '保存先をえらぶ', () => { fsaPick(); },
+        'あとにする',     () => { renderSaveState(); });
+}
+
+/* 2回目以降。前回の記録ファイルを引き継ぐか聞く。
+   ここのボタン操作が、許可を出し直すときの「利用者の操作」にもなる。 */
+function askResume(h){
+  modal('前回の記録が見つかりました',
+        h.name + '\nこの続きから始めますか。',
+        '前回の続きから', async () => {
+          let ok = 'granted';
+          try {
+            if (await h.queryPermission({ mode:'readwrite' }) !== 'granted')
+              ok = await h.requestPermission({ mode:'readwrite' });
+          } catch (e) { ok = 'denied'; }
+          if (ok !== 'granted'){ waitHandle = h; renderSaveState(); return; }
+          FH = h; waitHandle = null;
+          await fsaLoad();
+          savedCount = records.length; savedJson = JSON.stringify(records);
+          recomputeAgg(); renderStats(); renderFoot(); renderTab();
+          if (score.s0 === null) newProblem();
+          renderSaveState();
+        },
+        '新しく始める', () => { waitHandle = h; renderSaveState(); });
 }
 
 /* 保存先をえらぶ。すでに中身があれば取り込む */
@@ -2259,17 +2330,9 @@ async function initStore(){
     storeMode = 'fsa';
     let h = null;
     try { h = await idbGet('handle'); } catch (e) {}
-    if (h){
-      let perm = 'prompt';
-      try { perm = await h.queryPermission({ mode: 'readwrite' }); } catch (e) {}
-      if (perm === 'granted'){ FH = h; await fsaLoad(); }
-      else waitHandle = h;                 /* 許可が要る。ボタンを出す */
-    }
-    savedCount = records.length;
-    savedJson  = JSON.stringify(records);
-    recomputeAgg(); renderStats(); renderFoot(); renderTab();
-    if (score.s0 === null) newProblem();
     renderSaveState();
+    if (h) askResume(h);                   /* 2回目以降は引き継ぐか聞く */
+    else   askSetup();                     /* 初回は保存の案内を出す */
     return;
   }
   if (!(window.claude && typeof window.claude.use === 'function')) return;
