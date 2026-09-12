@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAADdUlEQVR4nMSXe0hTURzHv+furtlqplmCkdqLDMqysCysoCSq9cCelj2tMHpRGRVFRAQiGJWFZohZ/aFpoPSwtD/siWlqYamhJalllqKkpss5t9s5Nzc2p86lbp9xOY/fuef33e+c87scHkY4Bfo4OcqkRwWQuYTAh3a5YmCoEwQUEgi5zWrN5cZ7hY16A9FXxgb5LieExBOQMRhEBAg1giDsqU4pyDAIcN84ZynhkAkbohN0SiaCeAR7O0PnUEK1uMGGiJHQ8t48tLIdILZ1zmBLTTjNdk4gZC7sBPPNUyV2E8B887T0hP3w5I1bctlQRB8OR8BM/17fUmvUSMq6j3O3L6K/cMaNgFnzLTpnyKQy7Fy6Aa5OLugvJgJGWzEhTVoYNWKkob135VYknYnBvtXbDX2xRyIQvDhQrO9RbsYdah/mIDeZh8cAwEskOL3lkFj/0VBr6PedPB1VtdVwlA9H2IZQPMl/gdY2lcm7nKXJm8pK8ebIgV7H0DyPuPREFFWUmvazHzXupv+e7a+o1Hizd3sU8KvoPeoL8tHwNl8s9U9LZYXZWK1Oi/DEq2hsaTKzyR2GImRZEB7lZonR6EqPS1Bw6jikCsU/B+1qlMVdQ+u3r3Cd5w+fs+fRV9YuUIpLcCXtRrf2XpdgWtgJTDt2ErxcDv+4m3ALWAJBp4M1MOcvP+TiU/WXbu29bsLiS5Fi2aFSITs0xBCBvkI6v/ZTx3lBKuGh0XaYjekxAs7eMzBh81Z4rAqEZIgMXqH7MVa5EsM9x8EamlUtcHF0xrqFym7tPUbAN+KCWNYX5IHwEozynS0+1sBOQdqrx1gzfzkOrglByvOH4qkwxuIxlCoc4eIzC/+Lqu0PEjKS4T56DJR+i83sFgWM8JoCv6gYS8NQkZSDBd5+WL9wBXKiH5jYmACWgA6v3W29gP7ANiFL2Wwf3Mq8Cy/3iaJIYwYkFTPGB88z65u9f4WhHpkSKz5dMYlARt5TlNdUwhIdWi2eFb7Gx6rP6C/EY9McAXaERaAW9qOWYzcW2AnmmyNEZzcBzDfXjo7rVEojbA31yXxzP5MLK3WE7IKNoWl6J/MtYY3m4u+liqluNOljEU0dCgwinZfTIHovTGdtid7QXFJTzk1yTZBJuHZ6PVfTBMaEDMPAwK7n2fR6nvhbrdlWl/quWG/4CwAA//8EsVKjAAAABklEQVQDAHd3NETbr/vgAAAAAElFTkSuQmCC">
 <title>テンパイ1000本ノック</title>
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap");
@@ -150,6 +151,7 @@ h1 .sub{
 .rec-ans .ng{color:var(--ng-text)}
 .rec-ans .ok{color:var(--ok-text)}
 .rec-ans .dk{color:var(--sub)}
+.rec-ans .lab2{font-size:12px;color:var(--sub)}
 .more{display:block;margin:14px auto 0}
 
 /* ============ 設定 ============ */
@@ -166,8 +168,6 @@ h1 .sub{
   border-radius:8px;padding:9px 13px;font-size:14.5px;
 }
 .conf-item:hover{border-color:var(--sub)}
-.conf-item.full{opacity:.45}
-.conf-warn{font-size:13px;color:var(--ng-text);margin:0 0 10px}
 .conf-item.on{border-color:var(--ai);background:color-mix(in srgb,var(--ai) 8%,var(--surface));color:var(--ink)}
 .ci-box{
   width:20px;height:20px;flex:none;border:1px solid var(--line-2);border-radius:5px;
@@ -227,6 +227,14 @@ h1 .sub{
 .seat-left .oya{top:-25px;left:50%;transform:translateX(-50%) rotate(-9deg)}
 .seat-right .oya{top:-25px;left:50%;transform:translateX(-50%) rotate(9deg)}
 .center{grid-column:2;grid-row:2;display:flex;flex-direction:column;align-items:center;gap:2px}
+.ba-row{display:flex;align-items:center;gap:18px}
+.inds{
+  display:flex;align-items:center;gap:16px;
+  border:2px solid var(--aka);border-radius:8px;padding:3px 13px 6px;
+}
+.ind{display:flex;flex-direction:column;align-items:center;gap:3px}
+.ind-cap{font-size:11px;letter-spacing:.06em;color:var(--sub);white-space:nowrap}
+.ind .tile{--w:clamp(20px,4.4vw,32px)}
 .ba{font-family:var(--mincho);font-size:25px;letter-spacing:.22em;color:var(--sub);font-weight:600}
 .ba-self{font-size:16px;letter-spacing:.08em;color:var(--aka);height:23px;font-weight:600}
 .mine{grid-column:1/-1;grid-row:3;display:flex;flex-direction:column;align-items:center;gap:7px;width:100%}
@@ -316,6 +324,10 @@ button{font-family:var(--gothic);font-size:15.5px;cursor:pointer}
 }
 .chip[aria-pressed="true"]{border-color:var(--ai);background:color-mix(in srgb,var(--ai) 12%,var(--surface));font-weight:500}
 .chip:focus-visible{outline:2px solid var(--ai);outline-offset:2px}
+.chip.pt{font-variant-numeric:tabular-nums;font-size:15.5px;padding:9px 20px}
+.chip.pt.on{border-color:var(--ai);background:color-mix(in srgb,var(--ai) 12%,var(--surface));font-weight:600}
+.brk{font-size:14px;line-height:1.9;color:var(--ink)}
+.brk.total{font-family:var(--mincho);font-size:18px;font-weight:600}
 
 .qblock{
   margin:0 -16px;padding:28px 16px 10px;
@@ -337,6 +349,14 @@ button{font-family:var(--gothic);font-size:15.5px;cursor:pointer}
   font-family:var(--mincho);font-size:19px;font-weight:600;letter-spacing:.14em;
   color:var(--ink);border-bottom:2px solid var(--ai);padding:0 4px 1px;
 }
+.yakuline{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:-6px 0 16px}
+.yakuline-l{font-size:14.5px;color:var(--ink)}
+.yakuline-c{
+  display:inline-flex;align-items:center;
+  border:1px solid var(--ai);background:color-mix(in srgb,var(--ai) 12%,var(--surface));
+  color:var(--ink);
+  border-radius:999px;padding:4px 13px;font-size:14px;font-weight:500;white-space:nowrap;
+}
 .ansline{display:flex;align-items:center;gap:11px;margin-top:9px;flex-wrap:wrap}
 .anslabel{
   font-size:11.5px;letter-spacing:.14em;color:var(--sub);
@@ -355,10 +375,6 @@ button{font-family:var(--gothic);font-size:15.5px;cursor:pointer}
   background:var(--ok-fill);border-color:var(--ok-fill);color:#fff;
   font-weight:700;font-size:16px;padding:7px 16px;
   box-shadow:0 0 0 3px color-mix(in srgb,var(--ok-text) 25%,transparent);
-}
-.miss-tag{
-  font-size:11px;font-weight:700;letter-spacing:.08em;line-height:1;
-  background:#fff;color:var(--ok-fill);border-radius:3px;padding:3px 5px;
 }
 .btn.on:disabled{opacity:1}
 .chip:disabled,.pick:disabled{cursor:default}
@@ -665,11 +681,15 @@ function judgeWin(c14, winTile, bakaze, jikaze, winBy){
   const chiitoi = isChiitoi(c14);
   if (!decs.length && !chiitoi) return null;
 
+  const RULES = (typeof settings !== 'undefined' && settings.rules)
+              ? settings.rules : {renpuu4:true, kiriage:true, kazoe:true};
   let best = null;
   for (const d of decs){
     const r = evalDec(c14, d, winTile, bakaze, jikaze, winBy);
     const han = r.yaku.reduce((a,y)=>a+y.han,0);
-    if (!best || han > best.han) best = {han, yaku:r.yaku, dec:d, isChinitsu:r.isChinitsu};
+    const f = fuOf(c14, d, winTile, bakaze, jikaze, winBy, r.yaku, RULES);
+    if (!best || han > best.han || (han === best.han && f.fu > best.fu))
+      best = {han, yaku:r.yaku, dec:d, isChinitsu:r.isChinitsu, fu:f.fu, fuRaw:f.raw, fuParts:f.parts};
   }
   if (chiitoi){
     const si = suitInfo(c14);
@@ -681,7 +701,8 @@ function judgeWin(c14, winTile, bakaze, jikaze, winBy){
     for (let i=0;i<34;i++) if (c14[i] && !isTerminal(i)) allYao = false;
     if (allYao) yaku.push({key:'honroutou', name:'混老頭', han:2});
     const han = yaku.reduce((a,y)=>a+y.han,0);
-    if (!best || han > best.han) best = {han, yaku, dec:null, isChinitsu:si.isChinitsu};
+    if (!best || han > best.han)
+      best = {han, yaku, dec:null, isChinitsu:si.isChinitsu, fu:25, fuRaw:25, fuParts:[['七対子',25]]};
   }
 
   const big = new Set();
@@ -689,6 +710,125 @@ function judgeWin(c14, winTile, bakaze, jikaze, winBy){
   for (const n of bigYaku(c14, null)) big.add(n);
   best.bigYaku = [...big];
   return best;
+}
+
+/* ==========================================================
+   符計算・点数計算
+   ========================================================== */
+/* ドラ表示牌の次の牌がドラ */
+function doraOf(ind){
+  if (ind < 27) { const r = ind % 9; return ind - r + ((r + 1) % 9); }
+  if (ind <= 30) return 27 + ((ind - 27 + 1) % 4);      // 東南西北
+  return 31 + ((ind - 31 + 1) % 3);                      // 白發中
+}
+function countDora(c14, inds){
+  let n = 0;
+  for (const ind of inds){ if (ind == null) continue; n += c14[doraOf(ind)] || 0; }
+  return n;
+}
+
+/* この分け方での符。parts は内訳の説明 */
+function fuOf(c14, dec, winTile, bakaze, jikaze, winBy, yaku, rules){
+  const has = k => yaku.some(y => y.key === k);
+  if (has('chiitoi')) return { fu:25, raw:25, parts:[['七対子', 25]] };
+  if (has('pinfu'))
+    return winBy === 'tsumo' ? { fu:20, raw:20, parts:[['ピンフ・ツモ', 20]] }
+                             : { fu:30, raw:30, parts:[['副底', 20], ['門前ロン', 10]] };
+
+  const parts = [['副底', 20]];
+  let fu = 20;
+  if (winBy === 'ron'){ fu += 10; parts.push(['門前ロン', 10]); }
+  else               { fu += 2;  parts.push(['ツモ', 2]); }
+
+  /* 面子。ロンで完成した刻子だけ明刻あつかい */
+  let ronUsed = false;
+  for (const m of dec.melds){
+    if (m.type !== 'set') continue;
+    const yao = isTerminal(m.start);
+    let open = false;
+    if (winBy === 'ron' && m.start === winTile && !ronUsed){ open = true; ronUsed = true; }
+    const v = open ? (yao ? 4 : 2) : (yao ? 8 : 4);
+    fu += v;
+    parts.push([(open ? '明刻' : '暗刻') + '（' + JP[m.start] + '）', v]);
+  }
+
+  /* 雀頭 */
+  let head = 0;
+  if (dec.pair >= 31) head += 2;
+  if (dec.pair === bakaze) head += 2;
+  if (dec.pair === jikaze) head += 2;
+  if (!rules.renpuu4 && head > 2) head = 2;              // 連風牌を2符とする流儀
+  if (head){ fu += head; parts.push(['雀頭（' + JP[dec.pair] + '）', head]); }
+
+  /* 待ち */
+  let wait = 0, waitName = '';
+  if (dec.pair === winTile){ wait = 2; waitName = '単騎待ち'; }
+  else {
+    for (const m of dec.melds){
+      if (m.type !== 'run') continue;
+      const r = rankOf(m.start);
+      if (winTile === m.start + 1){ wait = 2; waitName = '嵌張待ち'; break; }
+      if (winTile === m.start && r === 7){ wait = 2; waitName = '辺張待ち'; break; }
+      if (winTile === m.start + 2 && r === 1){ wait = 2; waitName = '辺張待ち'; break; }
+    }
+  }
+  if (wait){ fu += wait; parts.push([waitName, wait]); }
+
+  const up = Math.ceil(fu / 10) * 10;
+  return { fu: up, raw: fu, parts };
+}
+
+/* 翻と符から点数。base は「基本点」 */
+function basePoints(han, fu, isYakuman, rules){
+  if (isYakuman)                 return { name:'役満',   base:8000 };
+  if (han >= 13 && rules.kazoe)  return { name:'数え役満', base:8000 };
+  const h = (han >= 13 && !rules.kazoe) ? 12 : han;
+  if (h >= 11) return { name:'三倍満', base:6000 };
+  if (h >= 8)  return { name:'倍満',   base:4000 };
+  if (h >= 6)  return { name:'跳満',   base:3000 };
+  if (h === 5) return { name:'満貫',   base:2000 };
+  const b = fu * Math.pow(2, 2 + h);
+  if (b >= 2000)                    return { name:'満貫', base:2000 };
+  if (rules.kiriage && b === 1920)  return { name:'切り上げ満貫', base:2000 };
+  return { name:'', base:b };
+}
+const ceil100 = n => Math.ceil(n / 100) * 100;
+
+/* 支払い。oya … 自分が親か */
+function payments(base, oya, winBy){
+  if (winBy === 'ron'){
+    const t = ceil100(base * (oya ? 6 : 4));
+    return { kind:'ron', total:t, split:null };
+  }
+  if (oya){
+    const each = ceil100(base * 2);
+    return { kind:'tsumo-oya', each, total: each * 3, split: each + ' オール' };
+  }
+  const ko = ceil100(base), oyaPay = ceil100(base * 2);
+  /* 内訳は 子の支払い / 親の支払い */
+  return { kind:'tsumo-ko', ko, oyaPay, total: ko * 2 + oyaPay, split: ko + ' / ' + oyaPay };
+}
+/* 選択肢や解説に出す文字列。「8000点（4000 / 2000・子の満貫）」 */
+function payLabel(pay, rankName, oya){
+  const inner = [];
+  if (pay.split) inner.push(pay.split);
+  if (rankName) inner.push((oya ? '親' : '子') + 'の' + (rankName === '切り上げ満貫' ? '満貫' : rankName));
+  return pay.total + '点' + (inner.length ? '（' + inner.join('・') + '）' : '');
+}
+
+/* まとめて計算する */
+function scoreOf(best, c14, winTile, bakaze, jikaze, winBy, oya, doraInds, rules, riichi){
+  const isYakuman = best.yaku.some(y => y.key === 'suuankou');
+  /* リーチとメンゼンツモは judgeWin の外で持っているので、ここで足す */
+  const extra = isYakuman ? 0 : ((riichi ? 1 : 0) + (winBy === 'tsumo' ? 1 : 0));
+  const yakuHan = best.yaku.reduce((a, y) => a + y.han, 0) + extra;
+  const dora = countDora(c14, doraInds);
+  const han = isYakuman ? yakuHan : yakuHan + dora;
+  const f = best.fu != null ? { fu:best.fu, raw:best.fuRaw, parts:best.fuParts } : { fu:30, raw:30, parts:[] };
+  const bp = basePoints(han, f.fu, isYakuman, rules);
+  const pay = payments(bp.base, oya, winBy);
+  return { han, yakuHan, dora, fu:f.fu, fuRaw:(f.raw == null ? f.fu : f.raw), fuParts:f.parts,
+           rank:bp.name, base:bp.base, pay };
 }
 
 /* 待ちの形の呼び名 */
@@ -937,8 +1077,9 @@ const ALL_YAKU = [
   {key:'suuankou',       label:'四暗刻（スーアンコウ）'}
 ];
 const DEFAULT_ON = ['riichi','tsumo','tanyao','pinfu','iipeiko','honitsu','yakuhai','chiitoi','ittsu'];
-const MAX_ON = 15;                       // 選択肢が増えすぎないよう、ONにできる上限
-let settings = { on:{}, notenRate:0.25 };
+const MAX_CHOICES = 15;                  // 問4に並べる選択肢の数（「あがれない」を含む）
+let settings = { on:{}, notenRate:0.25, score:false,
+                 rules:{ renpuu4:true, kiriage:true, kazoe:true } };
 for (const o of ALL_YAKU) settings.on[o.key] = DEFAULT_ON.indexOf(o.key) >= 0;
 const yakuOn = k => !!settings.on[k];
 const onKeys = () => ALL_YAKU.filter(o => settings.on[o.key]).map(o => o.key);
@@ -955,6 +1096,19 @@ function rollTarget(){
   return pool[rnd(pool.length)];
 }
 
+/* ドラ表示牌を選ぶ。ドラ0枚ばかりにならないよう枚数を狙って探す */
+function pickIndicator(c14, want){
+  const cand = [];
+  for (let i=0;i<34;i++) if ((c14[i]||0) < 4) cand.push(i);
+  const hit = cand.filter(i => (c14[doraOf(i)]||0) === want);
+  if (hit.length) return pick(hit);
+  return pick(cand);
+}
+function rollDoraCount(){
+  const x = Math.random();
+  return x < 0.42 ? 0 : x < 0.76 ? 1 : 2;
+}
+
 function makeProblem(){
   for (let attempt=0; attempt<6000; attempt++){
     const bakaze = Math.random()<0.7 ? 27 : 28;
@@ -965,7 +1119,7 @@ function makeProblem(){
     const jikaze = windsFromOya(seatOfOya);
     if (Math.random() < settings.notenRate){
       const h = makeNoten(); if (!h) continue;
-      return {tenpai:false, yakuKind:'noyaku', hand:h, waits:[], answerTile:null, answerYaku:[], answerKeys:[], bakaze, jikaze, seatOfOya, winBy, riichi};
+      return {tenpai:false, yakuKind:'noyaku', hand:h, waits:[], answerTile:null, answerYaku:[], answerKeys:[], bakaze, jikaze, seatOfOya, winBy, riichi, dora:null, ura:null};
     }
     const target = rollTarget();
     const built = build(target, bakaze, jikaze); if (!built) continue;
@@ -977,7 +1131,14 @@ function makeProblem(){
                 : v.perWait.filter(p=>p.keys.includes(target));
     if (!cands.length) continue;
     const ans = pick(cands);
-    return {tenpai:true, yakuKind:v.yakuKind, hand:v.hand, waits:v.waits, answerTile:ans.tile, answerYaku:ans.yaku, answerKeys:ans.keys, bakaze, jikaze, seatOfOya, winBy, riichi};
+    /* 点数計算をONにしているときだけ、ドラ表示牌を決める */
+    let dora = null, ura = null;
+    if (settings.score){
+      const c14 = v.hand.slice(); c14[ans.tile]++;
+      dora = pickIndicator(c14, rollDoraCount());
+      if (riichi){ const c2 = c14.slice(); c2[dora] = (c2[dora]||0); ura = pickIndicator(c2, rollDoraCount()); }
+    }
+    return {tenpai:true, yakuKind:v.yakuKind, hand:v.hand, waits:v.waits, answerTile:ans.tile, answerYaku:ans.yaku, answerKeys:ans.keys, bakaze, jikaze, seatOfOya, winBy, riichi, dora, ura};
   }
   return null;
 }
@@ -1104,17 +1265,34 @@ const NOWIN = {key:'nowin', label:'あがれない（チョンボになる）'};
    全問門前なので、ツモの回は必ずメンゼンツモがつく。他の役と重ねて選ぶ。
    「あがれない」だけは他と両立しないので単独選択。 */
 
-/* ONにした役だけを、ALL_YAKU の並び順で出す。最後に「あがれない」 */
+/* 問4に並べる選択肢。ONの役が多いときは MAX_CHOICES 個までに絞る。
+   正解の役はかならず入れ、残りはONの中からダミーを無作為に混ぜる。
+   並びは ALL_YAKU の順のままにして、最後に「あがれない」を置く。 */
 function yakuOptions(){
-  return ALL_YAKU.filter(o => settings.on[o.key]).concat([NOWIN]);
+  const on = ALL_YAKU.filter(o => settings.on[o.key]);
+  const room = MAX_CHOICES - 1;                    /* 「あがれない」の分 */
+  if (on.length <= room) return on.concat([NOWIN]);
+  const want = new Set(wantKeys());
+  const keep = new Set(on.filter(o => want.has(o.key)).map(o => o.key));
+  const rest = on.filter(o => !keep.has(o.key));
+  for (let i = rest.length - 1; i > 0; i--){ const j = rnd(i + 1); const t = rest[i]; rest[i] = rest[j]; rest[j] = t; }
+  for (const o of rest){ if (keep.size >= room) break; keep.add(o.key); }
+  return on.filter(o => keep.has(o.key)).concat([NOWIN]);
 }
 const yakuLabelOf = k => {
   const o = ALL_YAKU.concat([NOWIN]).find(x => x.key === k);
   return o ? o.label : k;
 };
 
+/* 片アガリ禁止。役がつかない待ちを含む手は、リーチをしていなければロンではあがれない。
+   ツモはメンゼンツモがつくので可。リーチをした回は役が確定するので対象外。 */
+function isKataAgari(){
+  return !!P.tenpai && P.yakuKind === 'mixed' && !P.riichi && P.winBy === 'ron';
+}
+
 /* いまの問題の正解（役のキーの集合） */
 function wantKeys(){
+  if (isKataAgari()) return ['nowin'];
   const base = [...new Set(P.answerKeys)];
   if (base.indexOf('suuankou') >= 0) return ['suuankou'];   // 役満は単独
   if (P.riichi) base.push('riichi');
@@ -1123,6 +1301,7 @@ function wantKeys(){
 }
 /* 記録から同じものを出し直す */
 function realKeys(r){
+  if (r.kind === 'mixed' && !r.ri && r.by === 'ron') return ['nowin'];
   const base = r.yaku ? [...new Set(r.yaku)] : [];
   if (base.indexOf('suuankou') >= 0) return ['suuankou'];
   if (r.ri) base.push('riichi');
@@ -1131,17 +1310,26 @@ function realKeys(r){
 }
 const SEAT_LABEL = ['自分が親','下家が親','対面が親','上家が親'];
 
-let agg = { total:0, windN:0, s0:0, s1:0, tenpaiN:0, s2:0, s3:0 };
+let agg = { total:0, windN:0, s0:0, s1:0, tenpaiN:0, s2:0, s3:0, ptN:0, s4:0 };
 
 let P = null;                       // 現在の問題
 let said0 = { ba:null, ji:null };   // 1問目に選んだ風
 let said1 = null;                   // 2問目に選んだ答え
+let said4 = null;                   // 5問目に選んだ点数
 let picked = new Set();             // 待ちの選択
 let pickedYaku = new Set();         // 役の選択
-let score = { s0:null, s1:null, s2:null, s3:null };
-let dunno = { s0:false, s1:false, s2:false, s3:false };   // 「分からない」を選んだか
+let score = { s0:null, s1:null, s2:null, s3:null, s4:null };
+let dunno = { s0:false, s1:false, s2:false, s3:false, s4:false };   // 「分からない」を選んだか
 let lastRender = 0;                 // 画面を描いた時刻
 const tooSoon = () => Date.now() - lastRender < 320;
+
+/* ドラ表示牌の小さな表示 */
+function indBox(label, t){
+  const d = el('ind');
+  d.appendChild(el('ind-cap', label));
+  d.appendChild(tileEl(t));
+  return d;
+}
 
 /* ---------- 卓の描画 ---------- */
 /* 席の並びは 0=自分 1=下家(右) 2=対面 3=上家(左) */
@@ -1160,7 +1348,16 @@ function tableEl(opts){
   seats.appendChild(top); seats.appendChild(left); seats.appendChild(right);
 
   const center = el('center');
-  center.appendChild(el('ba', JP[Q.bakaze] + '場'));
+  const baRow = el('ba-row');
+  baRow.appendChild(el('ba', JP[Q.bakaze] + '場'));
+  /* ドラ表示牌・裏ドラ表示牌は、点数を聞く問5になってから出す */
+  if (opts.ind && Q.dora != null){
+    const inds = el('inds');
+    inds.appendChild(indBox('ドラ表示', Q.dora));
+    if (opts.ura && Q.ura != null) inds.appendChild(indBox('裏ドラ表示', Q.ura));
+    baRow.appendChild(inds);
+  }
+  center.appendChild(baRow);
   center.appendChild(el('ba-self', opts.showSelf ? '自分＝' + JP[Q.jikaze] + '家' : ''));
   seats.appendChild(center);
 
@@ -1192,6 +1389,7 @@ function renderStats(){
     ['待ち当て',  pct(agg.s2, agg.tenpaiN), ''],
     ['役当て',    pct(agg.s3, agg.tenpaiN), '']
   ];
+  if (agg.ptN) cells.push(['点数', pct(agg.s4, agg.ptN), '']);
   for (const [k,v,u] of cells){
     const c = el('stat');
     c.appendChild(el('k', k));
@@ -1279,9 +1477,9 @@ function q0Block(){
 }
 
 const Q1_OPTIONS = [
-  { key:'yaku',   label:'テンパイ（役あり）',   note:['どの牌であがっても役がつく'] },
-  { key:'noyaku', label:'テンパイ（役なし）',   note:['※ツモならあがれる','※リーチすればロンでもあがれる'] },
-  { key:'mixed',  label:'テンパイ（待ちによる）', note:['役がつく牌とつかない牌がある','※ツモならあがれる','※リーチすればロンでもあがれる'] },
+  { key:'yaku',   label:'テンパイ・役あり',     note:['どの待ちであがっても役がつく'] },
+  { key:'noyaku', label:'テンパイ・役なし',     note:['※ツモならあがれる','※リーチすればロンでもあがれる'] },
+  { key:'mixed',  label:'テンパイ・役は待ち次第', note:['役がつく待ちとつかない待ちがある＝片アガリ','※ツモかリーチならあがれる'] },
   { key:'noten',  label:'テンパイしていない',   note:[] }
 ];
 const q1Answer = () => !P.tenpai ? 'noten' : P.yakuKind;
@@ -1395,7 +1593,8 @@ function q3Block(){
   line.appendChild(el('wl-ji', 'であがった'));
   blk.appendChild(line);
 
-  const opts = yakuOptions();
+  if (!q4opts) q4opts = yakuOptions();
+  const opts = q4opts;
   const chips = el('yaku-chips');
   for (const o of opts){
     const b = document.createElement('button');
@@ -1425,7 +1624,6 @@ function q3Block(){
         /* 選び忘れた役は大きく目立たせる */
         const miss = !dunno.s3 && !pickedYaku.has(k);
         const chip = el('anschip' + (miss ? ' miss' : ''));
-        if (miss) chip.appendChild(el('miss-tag', 'もれ'));
         chip.appendChild(el('anschip-l', yakuLabel(k)));
         box.appendChild(chip);
       }
@@ -1448,6 +1646,129 @@ function q3Block(){
     blk.appendChild(act);
   }
   return blk;
+}
+
+/* ---------- 5問目：点数 ---------- */
+const isOya = () => P.seatOfOya === 0;
+let q4opts = null;                       // この問題の役の選択肢（作り直さない）
+let q5opts = null;                       // この問題の点数の選択肢（作り直さない）
+
+/* いまの問題の点数一式 */
+function currentScore(){
+  const c14 = P.hand.slice(); c14[P.answerTile]++;
+  const j = judgeWin(c14, P.answerTile, P.bakaze, P.jikaze, P.winBy);
+  if (!j) return null;
+  const inds = [P.dora];
+  if (P.riichi && P.ura != null) inds.push(P.ura);
+  const s = scoreOf(j, c14, P.answerTile, P.bakaze, P.jikaze, P.winBy,
+                    isOya(), inds, settings.rules, P.riichi);
+  s.yaku = j.yaku;
+  return s;
+}
+/* 点数を聞ける問題か（あがれる手で、点数計算がONのとき） */
+function hasScoreQ(){
+  return !!settings.score && P.tenpai && P.answerTile != null && P.dora != null
+      && wantKeys().indexOf('nowin') < 0;
+}
+/* 選択肢。正解の周りの符・翻をずらして紛らわしいものを作る */
+function scoreChoices(sc){
+  const seen = {}, list = [];
+  const add = (han, fu) => {
+    if (han < 1 || fu < 20) return;
+    const bp = basePoints(han, fu, false, settings.rules);
+    const pay = payments(bp.base, isOya(), P.winBy);
+    const label = payLabel(pay, bp.name, isOya());
+    if (seen[label]) return;
+    seen[label] = 1;
+    list.push({ text: label, total: pay.total });
+  };
+  add(sc.han, sc.fu);
+  const correct = list[0].text;
+  for (const dh of [-2,-1,1,2]) for (const df of [-10,0,10]) add(sc.han + dh, sc.fu + df);
+  for (const h of [5,6,8,11]) add(h, sc.fu);
+  const others = list.filter(x => x.text !== correct);
+  for (let i=others.length-1;i>0;i--){ const j=rnd(i+1); const t=others[i]; others[i]=others[j]; others[j]=t; }
+  const shown = others.slice(0,3).concat(list.filter(x => x.text === correct));
+  shown.sort((a,b) => a.total - b.total);
+  return { correct, list: shown };
+}
+
+function q5Block(){
+  const done = score.s4 !== null;
+  const sc = currentScore();
+  const blk = el('qblock');
+  blk.appendChild(el('q', '【問５】さあ何点？'));
+  blk.appendChild(tableEl({ p:P, inline:true, win:true, showSelf:true, ind:true, ura:true }));
+
+  const line = el('winline');
+  line.appendChild(el('wl-ji', (P.riichi ? 'リーチをして' : 'リーチをしないで')
+    + '、' + (isOya() ? '親' : '子') + 'が'));
+  line.appendChild(tileEl(P.answerTile, 'win'));
+  line.appendChild(el('wl-key', P.winBy === 'tsumo' ? 'ツモ' : 'ロン'));
+  blk.appendChild(line);
+
+  /* 問4で確定した役を再掲する */
+  const yl = el('yakuline');
+  yl.appendChild(el('yakuline-l', '役は：'));
+  const ord = ALL_YAKU.map(o => o.key);
+  const yk = wantKeys().slice().sort((a,b) => ord.indexOf(a) - ord.indexOf(b));
+  for (const k of yk) yl.appendChild(el('yakuline-c', yakuLabel(k)));
+  blk.appendChild(yl);
+
+  if (!q5opts) q5opts = scoreChoices(sc);
+  const box = el('yaku-chips');
+  for (const o of q5opts.list){
+    const b = document.createElement('button');
+    b.className = 'chip pt' + (said4 === o.text ? ' on' : '');
+    b.textContent = o.text;
+    b.setAttribute('aria-pressed', said4 === o.text ? 'true' : 'false');
+    if (done) b.disabled = true;
+    else b.onclick = () => {
+      if (tooSoon()) return;
+      said4 = o.text; score.s4 = (o.text === q5opts.correct); render(true);
+    };
+    box.appendChild(b);
+  }
+  blk.appendChild(box);
+
+  if (done){
+    blk.appendChild(verdictLine(score.s4, dunno.s4));
+    if (!score.s4) blk.appendChild(ansLine(d => d.appendChild(el('ansval', q5opts.correct))));
+    blk.appendChild(scoreBreak(sc));
+  } else {
+    const act = el('actions');
+    act.appendChild(dunnoBtn(() => {
+      said4 = null; dunno.s4 = true; score.s4 = false; render(true);
+    }));
+    blk.appendChild(act);
+  }
+  return blk;
+}
+
+/* 符と翻の内訳 */
+function scoreBreak(sc){
+  const w = el('why');
+  const h = t => { const x=document.createElement('h3'); x.textContent=t; return x; };
+  const yakuman = sc.yaku.some(y => y.key === 'suuankou');
+
+  w.appendChild(h('翻'));
+  const hn = sc.yaku.map(y => y.name + ' ' + y.han);
+  if (!yakuman){
+    if (P.riichi) hn.push('リーチ 1');
+    if (P.winBy === 'tsumo') hn.push('メンゼンツモ 1');
+    if (sc.dora) hn.push('ドラ ' + sc.dora);
+  }
+  w.appendChild(el('brk', hn.join('　＋　') + '　＝　' + sc.han + '翻'));
+
+  w.appendChild(h('符'));
+  const fuLine = sc.fuParts.map(p => p[0] + ' ' + p[1]).join('　＋　') + '　＝　' + sc.fuRaw + '符'
+    + (sc.fuRaw !== sc.fu ? '　→　切り上げ ' + sc.fu + '符' : '');
+  w.appendChild(el('brk', fuLine));
+
+  w.appendChild(h('点数'));
+  w.appendChild(el('brk total', sc.fu + '符 ' + sc.han + '翻　→　'
+    + payLabel(sc.pay, sc.rank, isOya())));
+  return w;
 }
 
 function explainBlock(){
@@ -1481,7 +1802,9 @@ function isDone(){
   if (score.s1 === null) return false;
   if (!P.tenpai) return true;          // テンパイしていない手は1問で終わり
   if (score.s2 === null) return false;
-  return score.s3 !== null;
+  if (score.s3 === null) return false;
+  if (hasScoreQ()) return score.s4 !== null;
+  return true;
 }
 
 function scrollToLast(){
@@ -1501,6 +1824,7 @@ function render(scroll){
   /* 聴牌の手は、外しても最後まで答える */
   if (P.tenpai && score.s1 !== null) p.appendChild(q2Block());
   if (P.tenpai && score.s2 !== null) p.appendChild(q3Block());
+  if (P.tenpai && score.s3 !== null && hasScoreQ()) p.appendChild(q5Block());
   if (isDone()){
     if (!curRec) record();          // 解き終えた時点で1問ぶん積む
     p.appendChild(explainBlock());
@@ -1547,12 +1871,9 @@ function applySettings(o){
     for (const k in settings.on) if (typeof o.on[k] === 'boolean') settings.on[k] = o.on[k];
   if (typeof o.notenRate === 'number' && o.notenRate >= 0 && o.notenRate <= 1)
     settings.notenRate = o.notenRate;
-  /* 上限を超えていたら、並び順の先頭から MAX_ON 種類だけ残す */
-  let n = 0;
-  for (const y of ALL_YAKU){
-    if (!settings.on[y.key]) continue;
-    n++; if (n > MAX_ON) settings.on[y.key] = false;
-  }
+  if (typeof o.score === 'boolean') settings.score = o.score;
+  if (o.rules && typeof o.rules === 'object')
+    for (const k in settings.rules) if (typeof o.rules[k] === 'boolean') settings.rules[k] = o.rules[k];
 }
 function loadSettings(){
   try {
@@ -1562,7 +1883,7 @@ function loadSettings(){
 }
 function saveSettings(){
   if (storeMode === 'db' && DB){
-    DB.doc('config/settings').set({ on: settings.on, notenRate: settings.notenRate })
+    DB.doc('config/settings').set({ on: settings.on, notenRate: settings.notenRate, score: settings.score, rules: settings.rules })
       .catch(() => {});
   } else {
     savedJson = '';                    // ファイル版は「未保存」に落とす
@@ -1580,10 +1901,11 @@ function loadRecords(){
   recomputeAgg();
 }
 function recomputeAgg(){
-  agg = { total:0, windN:0, s0:0, s1:0, tenpaiN:0, s2:0, s3:0 };
+  agg = { total:0, windN:0, s0:0, s1:0, tenpaiN:0, s2:0, s3:0, ptN:0, s4:0 };
   for (const r of records){
     agg.total++;
     if (r.ok0 != null){ agg.windN++; if (r.ok0) agg.s0++; }
+    if (r.ok4 != null){ agg.ptN++;  if (r.ok4) agg.s4++; }
     if (r.ok && r.ok[0]) agg.s1++;
     if (r.kind !== 'noten'){
       agg.tenpaiN++;
@@ -1611,7 +1933,13 @@ function record(){
     a2:   [...picked],
     a3:   [...pickedYaku],
     ok:   [score.s1, score.s2, score.s3],
-    dk:   [dunno.s0, dunno.s1, dunno.s2, dunno.s3],
+    ok4:  score.s4,
+    a4:   said4,
+    pt:   (score.s4 !== null && q5opts) ? q5opts.correct : null,
+    hf:   (score.s4 !== null) ? (function(){ const x = currentScore();
+            return x ? { han:x.han, fu:x.fu, rank:x.rank, dora:x.dora } : null; })() : null,
+    dora: P.dora, ura: P.ura,
+    dk:   [dunno.s0, dunno.s1, dunno.s2, dunno.s3, dunno.s4],
     mark: false
   };
   records.push(curRec);
@@ -1722,7 +2050,7 @@ function saveFile(){
     return;
   }
   const json = JSON.stringify(records).replace(/</g, '\\u003c');
-  const conf = JSON.stringify({ on: settings.on, notenRate: settings.notenRate }).replace(/</g, '\\u003c');
+  const conf = JSON.stringify({ on: settings.on, notenRate: settings.notenRate, score: settings.score, rules: settings.rules }).replace(/</g, '\\u003c');
   const html = PRISTINE.replace(MARK, (m, head, tail) => head + json + tail)
                        .replace(MARK2, (m, head, tail) => head + conf + tail);
   const url = URL.createObjectURL(new Blob([html], { type:'text/html' }));
@@ -1756,7 +2084,7 @@ function renderTabs(){
       n.className = 'n'; n.textContent = records.length;
       b.appendChild(n);
     }
-    b.onclick = () => { tab = k; listShown = 50; renderTab(); };
+    b.onclick = () => { if (k !== 'conf') draft = null; tab = k; listShown = 50; renderTab(); };
     nav.appendChild(b);
   }
 }
@@ -1853,6 +2181,15 @@ function recDetail(r, i){
       if (!r.ok[2]) row.appendChild(el('ok', '→ ' + real));
     });
   }
+  if (r.ok4 != null){
+    line('点数', row => {
+      row.appendChild(dkOf(r,4) ? el('dk', '分からない')
+                                : el(r.ok4 ? 'ok' : 'ng', r.a4 || '（未選択）'));
+      if (!r.ok4 && r.pt) row.appendChild(el('ok', '→ ' + r.pt));
+      if (r.hf) row.appendChild(el('lab2', r.hf.fu + '符' + r.hf.han + '翻'
+        + (r.hf.dora ? '（ドラ' + r.hf.dora + '）' : '')));
+    });
+  }
   box.appendChild(ans);
   return box;
 }
@@ -1861,7 +2198,7 @@ function recHead(sticky, label){
   const head = el('rec-head' + (sticky ? '' : ' flat'));
   head.appendChild(el('sp', label));
   const mh = el('mkhead');
-  for (const t of ['風','聴牌','待ち','役']) mh.appendChild(el('mkh', t));
+  for (const t of ['風','聴牌','待ち','役','点数']) mh.appendChild(el('mkh', t));
   head.appendChild(mh);
   head.appendChild(el('rec-flag', ''));
   return head;
@@ -1890,6 +2227,7 @@ function recBlock(i, openIdx, onToggle){
   mk.appendChild(markEl(r.ok ? r.ok[0] : null, dkOf(r,1)));
   mk.appendChild(markEl(r.ok ? r.ok[1] : null, dkOf(r,2)));
   mk.appendChild(markEl(r.ok ? r.ok[2] : null, dkOf(r,3)));
+  mk.appendChild(markEl(r.ok4 == null ? null : !!r.ok4, dkOf(r,4)));
   row.appendChild(mk);
   row.appendChild(el('rec-flag', r.mark ? '\u2605' : ''));
 
@@ -2063,12 +2401,27 @@ function renderAgg(){
              dk: rs.filter(r => dkOf(r,3)).length, test };
   }).filter(row => row.n > 0)));
 
+  /* 5問目 … 点数 */
+  const ptRecs = records.filter(r => r.ok4 != null && r.hf);
+  if (ptRecs.length){
+    const bands = [['1〜2翻', h => h <= 2], ['3〜4翻', h => h === 3 || h === 4],
+                   ['満貫', h => h === 5], ['跳満以上', h => h >= 6]];
+    v.appendChild(h('5問目 ─ 翻数ごとの正答率'));
+    v.appendChild(aggTable('pt', ['翻数','正解／出題','分からない','正答率'], bands.map(([label, f]) => {
+      const test = r => r.ok4 != null && r.hf && f(r.hf.han);
+      const rs = records.filter(test);
+      return { label, n: rs.length, ok: rs.filter(r => r.ok4).length,
+               dk: rs.filter(r => dkOf(r,4)).length, test };
+    }).filter(row => row.n > 0)));
+  }
+
   /* 日ごと */
   const byDay = {};
   for (const r of records){
     const d = ymd(r.at); if (!d) continue;
-    const o = byDay[d] = byDay[d] || {n:0, w:0, s0:0, s1:0, t:0, s2:0, s3:0};
+    const o = byDay[d] = byDay[d] || {n:0, w:0, s0:0, s1:0, t:0, s2:0, s3:0, p:0, s4:0};
     o.n++; if (r.ok0 != null){ o.w++; if (r.ok0) o.s0++; }
+    if (r.ok4 != null){ o.p++; if (r.ok4) o.s4++; }
     if (r.ok && r.ok[0]) o.s1++;
     if (r.kind !== 'noten'){ o.t++; if (r.ok && r.ok[1]) o.s2++; if (r.ok && r.ok[2]) o.s3++; }
   }
@@ -2076,7 +2429,7 @@ function renderAgg(){
   v.appendChild(h('日ごとの推移'));
   const t = document.createElement('table');
   const hr = document.createElement('tr');
-  for (const c of ['日付','問題数','風あて','聴牌判定','待ち当て','役当て']){
+  for (const c of ['日付','問題数','風あて','聴牌判定','待ち当て','役当て','点数']){
     const th = document.createElement('th'); th.textContent = c; hr.appendChild(th);
   }
   t.appendChild(hr);
@@ -2084,7 +2437,7 @@ function renderAgg(){
   for (const d of days){
     const o = byDay[d], tr = document.createElement('tr');
     const c0 = document.createElement('td'); c0.textContent = d; tr.appendChild(c0);
-    for (const val of [o.n + '問', pc(o.s0,o.w), pc(o.s1,o.n), pc(o.s2,o.t), pc(o.s3,o.t)]){
+    for (const val of [o.n + '問', pc(o.s0,o.w), pc(o.s1,o.n), pc(o.s2,o.t), pc(o.s3,o.t), pc(o.s4,o.p)]){
       const td = document.createElement('td'); td.className = 'n'; td.textContent = val; tr.appendChild(td);
     }
     t.appendChild(tr);
@@ -2103,71 +2456,111 @@ function renderFoot(){
   f.appendChild(document.createTextNode('答えに使う役は '));
   const b = document.createElement('b'); b.textContent = names;
   f.appendChild(b);
-  f.appendChild(document.createTextNode(' の' + on.length + '種類。全問門前（鳴きなし）です。'));
+  f.appendChild(document.createTextNode(' の' + on.length
+    + '種類。全問門前（鳴きなし）・完全先付け（片アガリ禁止）です。'));
 }
 
 /* ---------- 設定 ---------- */
-let confMsg = '';                        // 上限に当たったときの案内
+/* 設定画面で編集中の内容。「設定完了」を押すまで本体には反映しない */
+let draft = null;
+const cloneSettings = o => ({
+  on: Object.assign({}, o.on), notenRate: o.notenRate,
+  score: o.score, rules: Object.assign({}, o.rules)
+});
 
 function renderConf(){
+  if (!draft) draft = cloneSettings(settings);
   const v = $('confView'); v.textContent = '';
-  const cnt = onKeys().length;
+  const cnt = ALL_YAKU.filter(o => draft.on[o.key]).length;
 
   const h = t => { const x = document.createElement('h2'); x.textContent = t; return x; };
-  v.appendChild(h('出題する役　' + cnt + '／' + MAX_ON + ' 種類'));
+  v.appendChild(h('出題する役　' + cnt + '／' + ALL_YAKU.length + ' 種類'));
   v.appendChild(el('conf-note',
     'ONにした役だけを出題します。OFFの役がつく手は出てきません。' +
     'メンゼンツモをOFFにすると全問ロン、リーチをOFFにすると全問リーチなしになります。' +
-    '選択肢が増えすぎないよう、ONにできるのは' + MAX_ON + '種類までです。'));
-  if (confMsg) v.appendChild(el('conf-warn', confMsg));
+    'ONが' + MAX_CHOICES + '種類を超えたときは、問4の選択肢が多くなりすぎないよう、' +
+    '正解の役に無作為のダミーを混ぜて' + MAX_CHOICES + '個だけ並べます。'));
 
   const box = el('conf-list');
   for (const o of ALL_YAKU){
-    const on = settings.on[o.key];
-    const full = !on && cnt >= MAX_ON;
+    const on = draft.on[o.key];
     const b = document.createElement('button');
-    b.className = 'conf-item' + (on ? ' on' : '') + (full ? ' full' : '');
+    b.className = 'conf-item' + (on ? ' on' : '');
     b.setAttribute('aria-pressed', on ? 'true' : 'false');
     b.appendChild(el('ci-box', on ? '✓' : ''));
     b.appendChild(el('ci-label', o.label));
-    b.onclick = () => {
-      if (full){ confMsg = MAX_ON + '種類までです。どれかをOFFにしてから選んでください。'; renderConf(); return; }
-      confMsg = '';
-      settings.on[o.key] = !on; saveSettings(); renderConf(); renderFoot();
-    };
+    b.onclick = () => { draft.on[o.key] = !on; renderConf(); };
     box.appendChild(b);
   }
   v.appendChild(box);
 
   const act = el('actions conf-act');
   const all = document.createElement('button');
-  all.className = 'btn'; all.textContent = '上限までON（' + MAX_ON + '種類）';
-  all.onclick = () => {
-    ALL_YAKU.forEach((o, i) => { settings.on[o.key] = i < MAX_ON; });
-    confMsg = ''; saveSettings(); renderConf(); renderFoot();
-  };
+  all.className = 'btn'; all.textContent = 'すべてON（' + ALL_YAKU.length + '種類）';
+  all.onclick = () => { for (const o of ALL_YAKU) draft.on[o.key] = true; renderConf(); };
   const def = document.createElement('button');
   def.className = 'btn'; def.textContent = 'はじめの9つに戻す';
   def.onclick = () => {
-    for (const o of ALL_YAKU) settings.on[o.key] = DEFAULT_ON.indexOf(o.key) >= 0;
-    confMsg = ''; saveSettings(); renderConf(); renderFoot();
+    for (const o of ALL_YAKU) draft.on[o.key] = DEFAULT_ON.indexOf(o.key) >= 0;
+    renderConf();
   };
   act.appendChild(all); act.appendChild(def);
   v.appendChild(act);
+
+  /* ---- 点数計算 ---- */
+  v.appendChild(h('点数計算'));
+  v.appendChild(el('conf-note',
+    'ONにすると設問が5つになり、最後に点数を答えます。卓にドラ表示牌が出ます。' +
+    'リーチした回の裏ドラ表示牌は、5問目になってから出ます。赤ドラは扱いません。'));
+  const sbox = el('conf-list');
+  const sw = (key, label, obj) => {
+    const on = obj[key];
+    const b = document.createElement('button');
+    b.className = 'conf-item' + (on ? ' on' : '');
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    b.appendChild(el('ci-box', on ? '✓' : ''));
+    b.appendChild(el('ci-label', label));
+    b.onclick = () => { obj[key] = !on; renderConf(); };
+    return b;
+  };
+  sbox.appendChild(sw('score', '点数計算をする', draft));
+  v.appendChild(sbox);
+
+  if (draft.score){
+    v.appendChild(el('conf-note', '細かい取り決め'));
+    const rbox = el('conf-list');
+    rbox.appendChild(sw('renpuu4', '連風牌の雀頭を4符にする', draft.rules));
+    rbox.appendChild(sw('kiriage', '切り上げ満貫を採用する', draft.rules));
+    rbox.appendChild(sw('kazoe',   '数え役満を採用する',     draft.rules));
+    v.appendChild(rbox);
+  }
 
   v.appendChild(h('テンパイしていない手の割合'));
   const rate = el('conf-rate');
   for (const r of [0, 0.1, 0.25, 0.4, 0.5]){
     const b = document.createElement('button');
-    b.className = 'chip' + (Math.abs(settings.notenRate - r) < 0.001 ? ' on' : '');
-    b.setAttribute('aria-pressed', Math.abs(settings.notenRate - r) < 0.001 ? 'true' : 'false');
+    const on = Math.abs(draft.notenRate - r) < 0.001;
+    b.className = 'chip' + (on ? ' on' : '');
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
     b.textContent = Math.round(r*100) + '%';
-    b.onclick = () => { settings.notenRate = r; saveSettings(); renderConf(); };
+    b.onclick = () => { draft.notenRate = r; renderConf(); };
     rate.appendChild(b);
   }
   v.appendChild(rate);
 
-  v.appendChild(el('conf-note', '設定は次の問題から効きます。いまの問題はそのまま解けます。'));
+  v.appendChild(el('conf-note',
+    '「設定完了」を押すまで設定は効きません。押すと、いま表示中の問題は破棄され、新しい設定の問題になります。'));
+  const fin = el('actions conf-act');
+  const go = document.createElement('button');
+  go.className = 'btn primary'; go.textContent = '設定完了';
+  go.onclick = () => {
+    settings = draft; draft = null;
+    saveSettings(); renderFoot();
+    tab = 'drill'; renderTab();
+    newProblem();
+  };
+  fin.appendChild(go);
+  v.appendChild(fin);
 }
 
 /* ---------- 進行 ---------- */
@@ -2186,8 +2579,9 @@ function newProblem(){
   }
   said0 = { ba:null, ji:null };
   said1 = null; picked = new Set(); pickedYaku = new Set();
-  score = { s0:null, s1:null, s2:null, s3:null };
-  dunno = { s0:false, s1:false, s2:false, s3:false };
+  score = { s0:null, s1:null, s2:null, s3:null, s4:null };
+  dunno = { s0:false, s1:false, s2:false, s3:false, s4:false };
+  said4 = null; q4opts = null; q5opts = null;
   curRec = null; curIdx = -1;
   render();
 }
