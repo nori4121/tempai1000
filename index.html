@@ -122,8 +122,14 @@ h1 .dev{
   margin:0 -6px;padding:0 6px;
 }
 .rec.open .rec-row{background:none}
+.rec-line{display:flex;align-items:center;gap:8px}
+.btn.redo{
+  flex:none;padding:5px 12px;font-size:12.5px;border-radius:999px;
+  white-space:nowrap;
+}
+.redo-sp{flex:none;width:74px}
 .rec-row{
-  display:flex;align-items:center;gap:12px;width:100%;
+  display:flex;align-items:center;gap:12px;width:100%;min-width:0;
   background:none;border:none;padding:9px 4px;text-align:left;color:var(--ink);
 }
 .rec-row:hover{background:var(--surface-2)}
@@ -132,23 +138,27 @@ h1 .dev{
 .rec-hand{display:flex;gap:2px;flex-wrap:nowrap;overflow:hidden;flex:1;min-width:0}
 .rec-hand .tile{--w:clamp(13px,2.9vw,21px)}
 .rec-hand .drawn{margin-left:9px}
-.marks{display:flex;gap:4px;flex:none}
-.mk{
-  width:24px;height:24px;border-radius:50%;font-size:12px;line-height:24px;
-  text-align:center;border:1px solid var(--line-2);color:var(--sub);
+.marks{
+  display:flex;flex:none;background:var(--surface);
+  border:1px solid var(--line-2);border-radius:4px;overflow:hidden;
 }
+.mk{
+  width:28px;height:24px;line-height:24px;font-size:14px;
+  text-align:center;color:var(--sub);border-left:1px solid var(--line-2);
+}
+.mk:first-child{border-left:0}
 .rec-head{
   position:sticky;top:0;z-index:2;background:var(--surface);
   display:flex;align-items:center;gap:12px;padding:7px 4px 6px;
   border-bottom:1px solid var(--line-2);
 }
 .rec-head .sp{flex:1;font-size:11.5px;letter-spacing:.1em;color:var(--sub)}
-.mkhead{display:flex;gap:4px;flex:none}
-.mkh{width:24px;font-size:11px;line-height:1.3;text-align:center;color:var(--sub);letter-spacing:0}
+.mkhead{display:flex;flex:none;padding:0 1px}
+.mkh{width:28px;font-size:11px;line-height:1.3;text-align:center;color:var(--sub);letter-spacing:0}
 .rec-note{font-size:12px;color:var(--sub);padding:8px 4px 0}
-.mk.o{background:var(--ok-fill);border-color:var(--ok-fill);color:#fff}
-.mk.x{background:var(--ng-fill);border-color:var(--ng-fill);color:#fff}
-.mk.q{background:var(--bar);border-color:var(--line-2);color:var(--sub);font-weight:700}
+.mk.o{color:var(--ok-text);font-weight:600}
+.mk.x{color:var(--ng-text);font-weight:600}
+.mk.q{color:var(--sub);font-weight:700;font-size:13px}
 .rec-flag{width:20px;flex:none;text-align:center;color:var(--ai);font-size:15px}
 .rec-open{padding:2px 4px 18px}
 .rec-ans{display:flex;flex-direction:column;gap:7px;font-size:14px;margin-top:10px}
@@ -363,6 +373,19 @@ button{font-family:var(--gothic);font-size:15.5px;cursor:pointer}
   border:1px solid var(--ai);background:color-mix(in srgb,var(--ai) 12%,var(--surface));
   color:var(--ink);
   border-radius:999px;padding:4px 13px;font-size:14px;font-weight:500;white-space:nowrap;
+}
+.prevline{
+  display:flex;align-items:center;gap:9px;flex-wrap:wrap;
+  margin:0 0 14px;padding:7px 12px;border-left:3px solid var(--line-2);
+  background:var(--surface-2);border-radius:0 6px 6px 0;
+}
+.prev-ji{font-size:13px;color:var(--sub)}
+.prev-v{font-size:14.5px;font-weight:600;color:var(--ink)}
+.prevline .tile{--w:clamp(20px,4.2vw,28px)}
+.rec-re{
+  display:inline-block;margin-top:3px;font-size:10.5px;font-weight:700;
+  letter-spacing:.08em;color:var(--ai);border:1px solid var(--ai);
+  border-radius:3px;padding:1px 5px;
 }
 .ansline{display:flex;align-items:center;gap:11px;margin-top:9px;flex-wrap:wrap}
 .anslabel{
@@ -1329,7 +1352,7 @@ let score = { s0:null, s1:null, s2:null, s3:null, s4:null };
 let dunno = { s0:false, s1:false, s2:false, s3:false, s4:false };   // 「分からない」を選んだか
 let lastRender = 0;                 // 画面を描いた時刻
 const tooSoon = () => Date.now() - lastRender < 320;
-const APP_VERSION = '2026-09-12.3';       // version.json と合わせる
+const APP_VERSION = '2026-09-12.9';       // version.json と合わせる
 const SHOW_SAVE = false;                  // 手動の「記録を保存」を出すかどうか
 
 /* ドラ表示牌の小さな表示 */
@@ -1410,6 +1433,49 @@ function renderStats(){
 }
 
 /* ---------- 設問の描画（下へ積み上げる） ---------- */
+/* やり直し中に、各設問の頭へ出す「前回は〇〇と回答しました」 */
+function prevLine(build){
+  const d = el('prevline');
+  d.appendChild(el('prev-ji', '前回は'));
+  build(d);
+  d.appendChild(el('prev-ji', 'と回答しました'));
+  return d;
+}
+function prevWind(){
+  if (!review) return null;
+  return prevLine(d => {
+    if (dkOf(review, 0)) { d.appendChild(el('prev-v', '分からない')); return; }
+    const w = review.w || [null, null];
+    d.appendChild(el('prev-v', '場 ' + (w[0] == null ? '—' : JP[w[0]])
+                             + '／自 ' + (w[1] == null ? '—' : JP[w[1]])));
+  });
+}
+function prevTenpai(){
+  if (!review) return null;
+  return prevLine(d => d.appendChild(el('prev-v',
+    dkOf(review, 1) ? '分からない' : q1Label(review.a1))));
+}
+function prevWaits(){
+  if (!review) return null;
+  return prevLine(d => {
+    if (dkOf(review, 2)) { d.appendChild(el('prev-v', '分からない')); return; }
+    const a = review.a2 || [];
+    if (!a.length) { d.appendChild(el('prev-v', '選択なし')); return; }
+    d.appendChild(tileRow(a));
+  });
+}
+function prevYaku(){
+  if (!review) return null;
+  return prevLine(d => d.appendChild(el('prev-v',
+    dkOf(review, 3) ? '分からない'
+                    : ((review.a3 || []).map(yakuLabel).join('・') || '選択なし'))));
+}
+function prevScore(){
+  if (!review || review.ok4 == null) return null;
+  return prevLine(d => d.appendChild(el('prev-v',
+    dkOf(review, 4) ? '分からない' : (review.a4 || '未選択'))));
+}
+
 function ansLine(build){
   const d = el('ansline');
   d.appendChild(el('anslabel', '正解'));
@@ -1441,6 +1507,7 @@ function q0Block(){
   const done = score.s0 !== null;
   const blk = el('qblock');
   blk.appendChild(el('q', '【問１】この局の風は？'));
+  if (review) blk.appendChild(prevWind());
 
   const row = (label, key, ans) => {
     const line = el('windrow');
@@ -1498,6 +1565,7 @@ function q1Block(){
   const done = score.s1 !== null;
   const blk = el('qblock');
   blk.appendChild(el('q', '【問２】聴牌していますか？'));
+  if (review) blk.appendChild(prevTenpai());
   const ch = el('choices');
   for (const o of Q1_OPTIONS){
     const b = document.createElement('button');
@@ -1534,6 +1602,7 @@ function q2Block(){
   const done = score.s2 !== null;
   const blk = el('qblock');
   blk.appendChild(el('q', '【問３】待ちはどれですか？'));
+  if (review) blk.appendChild(prevWaits());
   blk.appendChild(el('q-note', '和了牌になるものを、すべて選んでください。'));
 
   /* 上までスクロールしなくて済むよう、卓をここにも出す */
@@ -1589,6 +1658,7 @@ function q3Block(){
   const done = score.s3 !== null;
   const blk = el('qblock');
   blk.appendChild(el('q', '【問４】この牌であがったとき、つく役は？'));
+  if (review) blk.appendChild(prevYaku());
 
   /* 和了図。役牌の判定に風が要るので、卓ごと出す */
   blk.appendChild(tableEl({ inline:true, win:true, showSelf: isDone() }));
@@ -1659,6 +1729,7 @@ function q3Block(){
 
 /* ---------- 5問目：点数 ---------- */
 const isOya = () => P.seatOfOya === 0;
+let review = null;                       // やり直し中のとき、元になった記録
 let q4opts = null;                       // この問題の役の選択肢（作り直さない）
 let q5opts = null;                       // この問題の点数の選択肢（作り直さない）
 
@@ -1707,6 +1778,7 @@ function q5Block(){
   const sc = currentScore();
   const blk = el('qblock');
   blk.appendChild(el('q', '【問５】さあ何点？'));
+  if (review && prevScore()) blk.appendChild(prevScore());
   blk.appendChild(tableEl({ p:P, inline:true, win:true, showSelf:true, ind:true, ura:true }));
 
   const line = el('winline');
@@ -1798,6 +1870,8 @@ function explainBlock(){
     mk.textContent = curRec.mark ? '目印つき' : '目印をつける';
     renderSaveState();
     if (storeMode === 'db' && curIdx >= 0) dbWrite(curIdx);
+    if (storeMode === 'fs') fsSave();
+    if (storeMode === 'fsa') fsaWrite();
   };
   act.appendChild(mk);
 
@@ -1869,8 +1943,11 @@ let savedCount = 0;
 let curRec = null;      // いま解いている問題の記録
 let curIdx = -1;        // それが records の何番目か
 
-let storeMode = 'file';                 // 'file' | 'db'
+let storeMode = 'file';                 // 'file' | 'db' | 'fs'
 let DB = null, dbBusy = false, dbFailed = false;
+let FS = null, fsBusy = false, fsFailed = false, fsTimer = null;
+let FH = null, waitHandle = null;       // ブラウザ版。記録ファイルの参照
+let fsaBusy = false, fsaFailed = false, fsaTimer = null;
 const PAGE = 100;                       // 1ドキュメントにまとめる問題数
 const pagePath = n => 'records/p' + String(n).padStart(4, '0');
 
@@ -1891,6 +1968,13 @@ function loadSettings(){
   } catch (e) {}
 }
 function saveSettings(){
+  if (storeMode === 'fsa'){ fsaWrite(); return; }
+  if (storeMode === 'fs' && FS){
+    FS.saveSettings({ on: settings.on, notenRate: settings.notenRate,
+                      score: settings.score, rules: settings.rules })
+      .catch(() => { fsFailed = true; renderSaveState(); });
+    return;
+  }
   if (storeMode === 'db' && DB){
     DB.doc('config/settings').set({ on: settings.on, notenRate: settings.notenRate, score: settings.score, rules: settings.rules })
       .catch(() => {});
@@ -1949,6 +2033,7 @@ function record(){
             return x ? { han:x.han, fu:x.fu, rank:x.rank, dora:x.dora } : null; })() : null,
     dora: P.dora, ura: P.ura,
     dk:   [dunno.s0, dunno.s1, dunno.s2, dunno.s3, dunno.s4],
+    re:   !!review,
     mark: false
   };
   records.push(curRec);
@@ -1958,12 +2043,40 @@ function record(){
   renderTabs();
   renderSaveState();
   if (storeMode === 'db') dbWrite(curIdx);
+  if (storeMode === 'fs') fsSave();
+  if (storeMode === 'fsa') fsaWrite();
 }
 let savedJson = '[]';
 function renderSaveState(){
   const tag = $('unsaved'), btn = $('save');
   const marked = records.filter(r => r.mark).length;
 
+  if (storeMode === 'fsa'){                /* ブラウザ版 … 記録ファイルに自動保存 */
+    if (!FH){
+      btn.hidden = false; btn.disabled = false;
+      btn.textContent = waitHandle ? '記録ファイルにつなぐ' : '記録の保存先をえらぶ';
+      btn.onclick = waitHandle ? fsaGrant : fsaPick;
+      tag.textContent = waitHandle ? '前回の記録ファイルがあります' : '';
+      tag.classList.toggle('pending', !!waitHandle);
+      return;
+    }
+    btn.hidden = true;
+    let t = fsaFailed ? '保存できませんでした' : fsaBusy ? '保存中…' : '自動保存';
+    if (marked) t += '　目印 ' + marked + '問';
+    tag.textContent = t;
+    tag.classList.toggle('pending', fsaFailed || fsaBusy);
+    return;
+  }
+  if (storeMode === 'fs'){                 /* Electron版 … 自動保存 */
+    btn.hidden = true;
+    let t = fsFailed ? '保存できませんでした'
+          : fsBusy   ? '保存中…'
+          : records.length ? '自動保存' : '';
+    if (marked) t += '　目印 ' + marked + '問';
+    tag.textContent = t;
+    tag.classList.toggle('pending', fsFailed || fsBusy);
+    return;
+  }
   if (!SHOW_SAVE && storeMode !== 'db'){   /* 手動保存を隠しているとき */
     btn.hidden = true; tag.textContent = ''; tag.classList.remove('pending');
     return;
@@ -1993,6 +2106,111 @@ function renderSaveState(){
   btn.disabled = !dirty;
 }
 
+/* ---------- ブラウザ版の記録置き場 ----------
+   記録は利用者が選んだ普通のJSONファイルに書く。
+   ブラウザに置くのは「どのファイルか」という参照だけで、記録そのものではない。 */
+function idbOpen(){
+  return new Promise((res, rej) => {
+    const q = indexedDB.open('mj-store', 1);
+    q.onupgradeneeded = () => q.result.createObjectStore('kv');
+    q.onsuccess = () => res(q.result);
+    q.onerror   = () => rej(q.error);
+  });
+}
+async function idbGet(k){
+  const db = await idbOpen();
+  return new Promise((res, rej) => {
+    const t = db.transaction('kv', 'readonly').objectStore('kv').get(k);
+    t.onsuccess = () => res(t.result); t.onerror = () => rej(t.error);
+  });
+}
+async function idbSet(k, v){
+  const db = await idbOpen();
+  return new Promise((res, rej) => {
+    const t = db.transaction('kv', 'readwrite').objectStore('kv').put(v, k);
+    t.onsuccess = () => res(); t.onerror = () => rej(t.error);
+  });
+}
+
+/* 保存先をえらぶ。すでに中身があれば取り込む */
+async function fsaPick(){
+  let h = null;
+  try {
+    h = await window.showSaveFilePicker({
+      suggestedName: 'tempai1000-kiroku.json',
+      types: [{ description: 'テンパイ1000本ノックの記録', accept: { 'application/json': ['.json'] } }]
+    });
+  } catch (e) { return; }                 /* 取り消し */
+  FH = h; waitHandle = null;
+  try { await idbSet('handle', h); } catch (e) {}
+  await fsaLoad();
+  recomputeAgg(); renderStats(); renderFoot(); renderTab();
+  if (score.s0 === null) newProblem();
+  fsaWrite(); renderSaveState();
+}
+/* 前回の許可が残っていないときに、もう一度つなぐ */
+async function fsaGrant(){
+  if (!waitHandle) return fsaPick();
+  let ok = 'denied';
+  try { ok = await waitHandle.requestPermission({ mode: 'readwrite' }); } catch (e) {}
+  if (ok !== 'granted') return;
+  FH = waitHandle; waitHandle = null;
+  await fsaLoad();
+  recomputeAgg(); renderStats(); renderFoot(); renderTab();
+  if (score.s0 === null) newProblem();
+  fsaWrite(); renderSaveState();
+}
+async function fsaLoad(){
+  if (!FH) return;
+  let data = null;
+  try {
+    const t = await (await FH.getFile()).text();
+    data = t.trim() ? JSON.parse(t) : null;
+  } catch (e) { fsaFailed = true; return; }
+  if (!data) return;
+  if (data.settings) applySettings(data.settings);
+  if (Array.isArray(data.records)) records = data.records.concat(records);
+  if (curRec) curIdx = records.indexOf(curRec);
+}
+function fsaWrite(){
+  if (!FH) return;
+  clearTimeout(fsaTimer);
+  fsaTimer = setTimeout(async () => {
+    fsaBusy = true; renderSaveState();
+    try {
+      const w = await FH.createWritable();
+      await w.write(JSON.stringify({
+        app: 'tempai1000', version: APP_VERSION,
+        settings: { on: settings.on, notenRate: settings.notenRate,
+                    score: settings.score, rules: settings.rules },
+        records: records
+      }));
+      await w.close();
+      savedCount = records.length;
+      savedJson  = JSON.stringify(records);
+      fsaFailed = false;
+    } catch (e) { fsaFailed = true; }
+    fsaBusy = false; renderSaveState();
+  }, 300);
+}
+
+/* ---------- Electron版の記録置き場 ----------
+   userData の records.json にまるごと書く。書き込みは200ms間引く。 */
+function fsSave(){
+  if (!FS) return;
+  clearTimeout(fsTimer);
+  fsTimer = setTimeout(async () => {
+    fsBusy = true; renderSaveState();
+    try {
+      await FS.saveRecords(records);
+      savedCount = records.length;
+      savedJson  = JSON.stringify(records);
+      fsFailed = false;
+    } catch (e) { fsFailed = true; }
+    fsBusy = false; renderSaveState();
+  }, 200);
+}
+
 /* ---------- アーティファクトの記録置き場 ----------
    1ドキュメントにPAGE問ずつ束ねて置く。問題ごとに1件作ると
    ドキュメント数の上限に当たるため。 */
@@ -2018,6 +2236,42 @@ async function dbWrite(from){
    使えるかどうかは開いてみるまで分からないので、画面は先に出しておき、
    分かった時点で切り替える。待っている間に解いたぶんは取りこぼさない。 */
 async function initStore(){
+  /* Electron版。preload が用意した mjStore があればそれを使う */
+  if (window.mjStore){
+    FS = window.mjStore; storeMode = 'fs'; renderSaveState();
+    let data = null;
+    try { data = await FS.load(); } catch (e) { fsFailed = true; }
+    if (data){
+      if (data.settings) applySettings(data.settings);
+      if (Array.isArray(data.records)) records = data.records.concat(records);
+    }
+    if (curRec) curIdx = records.indexOf(curRec);
+    savedCount = records.length;
+    savedJson  = JSON.stringify(records);
+    recomputeAgg(); renderStats(); renderFoot(); renderTab();
+    if (score.s0 === null) newProblem();     /* 設定を読んでから出し直す */
+    renderSaveState();
+    return;
+  }
+  /* ブラウザ版。保存先のファイルを扱えるなら、そこに自動保存する */
+  if (typeof window.showSaveFilePicker === 'function'
+      && !(window.claude && typeof window.claude.use === 'function')){
+    storeMode = 'fsa';
+    let h = null;
+    try { h = await idbGet('handle'); } catch (e) {}
+    if (h){
+      let perm = 'prompt';
+      try { perm = await h.queryPermission({ mode: 'readwrite' }); } catch (e) {}
+      if (perm === 'granted'){ FH = h; await fsaLoad(); }
+      else waitHandle = h;                 /* 許可が要る。ボタンを出す */
+    }
+    savedCount = records.length;
+    savedJson  = JSON.stringify(records);
+    recomputeAgg(); renderStats(); renderFoot(); renderTab();
+    if (score.s0 === null) newProblem();
+    renderSaveState();
+    return;
+  }
   if (!(window.claude && typeof window.claude.use === 'function')) return;
   let db = null;
   try { db = await window.claude.use('db'); } catch (e) { db = null; }
@@ -2119,9 +2373,12 @@ function recProblem(r){
   for (const t of (r.hand || [])) hand[t]++;
   return {
     hand, bakaze:r.ba, jikaze:r.ji, seatOfOya:r.oya, winBy:r.by,
+    riichi: !!r.ri,
     tenpai: r.kind !== 'noten', yakuKind: r.kind,
     waits: r.waits || [], answerTile: r.win == null ? null : r.win,
-    answerKeys: r.yaku || []
+    answerYaku: [], answerKeys: r.yaku || [],
+    dora: r.dora == null ? null : r.dora,
+    ura:  r.ura  == null ? null : r.ura
   };
 }
 const yakuLabel = k => yakuLabelOf(k);
@@ -2147,9 +2404,24 @@ let openRec = -1;                        // 開いている記録の番号
 function markEl(v, dk){
   if (dk) return el('mk q', '？');
   return el('mk ' + (v === true ? 'o' : v === false ? 'x' : ''),
-            v === true ? '●' : v === false ? '×' : '−');
+            v === true ? '○' : v === false ? '×' : '−');
 }
 const dkOf = (r, i) => !!(r.dk && r.dk[i]);
+/* 記録から同じ問題をもう一度出す */
+function startReview(r){
+  review = r;
+  P = recProblem(r);
+  said0 = { ba:null, ji:null };
+  said1 = null; picked = new Set(); pickedYaku = new Set();
+  score = { s0:null, s1:null, s2:null, s3:null, s4:null };
+  dunno = { s0:false, s1:false, s2:false, s3:false, s4:false };
+  said4 = null; q4opts = null; q5opts = null;
+  curRec = null; curIdx = -1;
+  tab = 'drill'; renderTab();
+  render();
+  window.scrollTo({ top: 0, behavior: 'auto' });
+}
+
 function recDetail(r, i){
   const box = el('rec-open');
   const Q = recProblem(r);
@@ -2214,9 +2486,10 @@ function recHead(sticky, label){
   for (const t of ['風','聴牌','待ち','役','点数']) mh.appendChild(el('mkh', t));
   head.appendChild(mh);
   head.appendChild(el('rec-flag', ''));
+  head.appendChild(el('redo-sp', ''));
   return head;
 }
-const REC_NOTE = '\u25cf正解\u3000\u00d7不正解\u3000？分からない\u3000\u2212その設問なし（テンパイしていない手は待ちと役を聞きません）。行を押すと中身が開きます。';
+const REC_NOTE = '\u25cb正解\u3000\u00d7不正解\u3000？分からない\u3000\u2212その設問なし（テンパイしていない手は待ちと役を聞きません）。行を押すと中身が開きます。';
 
 /* 記録1件ぶんの行。一覧からも集計の中からも使う */
 function recBlock(i, openIdx, onToggle){
@@ -2241,11 +2514,21 @@ function recBlock(i, openIdx, onToggle){
   mk.appendChild(markEl(r.ok ? r.ok[1] : null, dkOf(r,2)));
   mk.appendChild(markEl(r.ok ? r.ok[2] : null, dkOf(r,3)));
   mk.appendChild(markEl(r.ok4 == null ? null : !!r.ok4, dkOf(r,4)));
+  if (r.re) no.appendChild(el('rec-re', 'やり直し'));
   row.appendChild(mk);
   row.appendChild(el('rec-flag', r.mark ? '\u2605' : ''));
 
   row.onclick = () => onToggle(i);
-  wrap.appendChild(row);
+
+  const line = el('rec-line');
+  line.appendChild(row);
+  const again = document.createElement('button');
+  again.className = 'btn redo'; again.textContent = 'やり直す';
+  again.title = 'この問題をもう一度出す';
+  again.onclick = () => startReview(r);
+  line.appendChild(again);
+
+  wrap.appendChild(line);
   if (openIdx === i) wrap.appendChild(recDetail(r, i));
   return wrap;
 }
@@ -2595,6 +2878,7 @@ function newProblem(){
   score = { s0:null, s1:null, s2:null, s3:null, s4:null };
   dunno = { s0:false, s1:false, s2:false, s3:false, s4:false };
   said4 = null; q4opts = null; q5opts = null;
+  review = null;
   curRec = null; curIdx = -1;
   render();
 }
