@@ -80,6 +80,7 @@ h1 .sub{
   display:block;font-family:var(--gothic);font-size:12px;font-weight:400;
   letter-spacing:.16em;color:var(--sub);margin-top:5px;
 }
+h1 .ver{margin-left:14px;letter-spacing:.06em;font-variant-numeric:tabular-nums}
 .savebox{display:flex;align-items:center;gap:12px}
 .unsaved{font-size:13px;color:var(--sub);white-space:nowrap}
 .unsaved.pending{color:var(--aka);font-weight:600}
@@ -441,7 +442,7 @@ button{font-family:var(--gothic);font-size:15.5px;cursor:pointer}
 <div class="wrap">
 
   <header>
-    <h1>テンパイ1000本ノック<span class="sub">TENPAI · WAITS · YAKU</span></h1>
+    <h1>テンパイ1000本ノック<span class="sub">TENPAI · WAITS · YAKU<span class="ver" id="ver"></span></span></h1>
     <div class="savebox">
       <span class="unsaved" id="unsaved"></span>
       <button class="btn save" id="save">記録を保存</button>
@@ -1322,6 +1323,7 @@ let score = { s0:null, s1:null, s2:null, s3:null, s4:null };
 let dunno = { s0:false, s1:false, s2:false, s3:false, s4:false };   // 「分からない」を選んだか
 let lastRender = 0;                 // 画面を描いた時刻
 const tooSoon = () => Date.now() - lastRender < 320;
+const APP_VERSION = '2026-09-12.1';       // version.json と合わせる
 
 /* ドラ表示牌の小さな表示 */
 function indBox(label, t){
@@ -2586,6 +2588,7 @@ function newProblem(){
   render();
 }
 
+$('ver').textContent = 'v' + APP_VERSION;
 loadSettings();
 loadRecords();
 renderFoot();
