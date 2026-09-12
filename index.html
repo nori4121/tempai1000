@@ -81,6 +81,11 @@ h1 .sub{
   letter-spacing:.16em;color:var(--sub);margin-top:5px;
 }
 h1 .ver{margin-left:14px;letter-spacing:.06em;font-variant-numeric:tabular-nums}
+h1 .dev{
+  display:inline-block;vertical-align:middle;margin-left:14px;
+  font-family:var(--gothic);font-size:12px;font-weight:600;letter-spacing:.12em;
+  color:var(--aka);border:1.5px solid var(--aka);border-radius:4px;padding:2px 9px;
+}
 .savebox{display:flex;align-items:center;gap:12px}
 .unsaved{font-size:13px;color:var(--sub);white-space:nowrap}
 .unsaved.pending{color:var(--aka);font-weight:600}
@@ -93,6 +98,7 @@ h1 .ver{margin-left:14px;letter-spacing:.06em;font-variant-numeric:tabular-nums}
 
 /* ============ タブ ============ */
 #drill{display:flex;flex-direction:column;gap:18px}
+[hidden]{display:none !important}
 .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line)}
 .tab{
   border:none;background:none;color:var(--sub);font-size:15px;
@@ -442,7 +448,7 @@ button{font-family:var(--gothic);font-size:15.5px;cursor:pointer}
 <div class="wrap">
 
   <header>
-    <h1>テンパイ1000本ノック<span class="sub">TENPAI · WAITS · YAKU<span class="ver" id="ver"></span></span></h1>
+    <h1>テンパイ1000本ノック<span class="dev">開発中</span><span class="sub">TENPAI · WAITS · YAKU<span class="ver" id="ver"></span></span></h1>
     <div class="savebox">
       <span class="unsaved" id="unsaved"></span>
       <button class="btn save" id="save">記録を保存</button>
@@ -1323,7 +1329,8 @@ let score = { s0:null, s1:null, s2:null, s3:null, s4:null };
 let dunno = { s0:false, s1:false, s2:false, s3:false, s4:false };   // 「分からない」を選んだか
 let lastRender = 0;                 // 画面を描いた時刻
 const tooSoon = () => Date.now() - lastRender < 320;
-const APP_VERSION = '2026-09-12.1';       // version.json と合わせる
+const APP_VERSION = '2026-09-12.3';       // version.json と合わせる
+const SHOW_SAVE = false;                  // 手動の「記録を保存」を出すかどうか
 
 /* ドラ表示牌の小さな表示 */
 function indBox(label, t){
@@ -1957,6 +1964,10 @@ function renderSaveState(){
   const tag = $('unsaved'), btn = $('save');
   const marked = records.filter(r => r.mark).length;
 
+  if (!SHOW_SAVE && storeMode !== 'db'){   /* 手動保存を隠しているとき */
+    btn.hidden = true; tag.textContent = ''; tag.classList.remove('pending');
+    return;
+  }
   if (storeMode === 'db'){                 /* アーティファクト … 自動保存 */
     btn.hidden = true;
     let t = dbFailed ? '保存できませんでした'
@@ -2010,7 +2021,7 @@ async function initStore(){
   if (!(window.claude && typeof window.claude.use === 'function')) return;
   let db = null;
   try { db = await window.claude.use('db'); } catch (e) { db = null; }
-  if (!db){ $('save').hidden = false; renderSaveState(); return; }
+  if (!db){ $('save').hidden = !SHOW_SAVE; renderSaveState(); return; }
 
   DB = db; storeMode = 'db';
   renderSaveState();
@@ -2597,7 +2608,7 @@ renderTab();
 renderSaveState();
 $('save').onclick = saveFile;
 /* アーティファクトの中では書き出しが使えない。db が使えるか分かるまで隠しておく */
-if (window.claude && typeof window.claude.use === 'function') $('save').hidden = true;
+if (!SHOW_SAVE || (window.claude && typeof window.claude.use === 'function')) $('save').hidden = true;
 newProblem();
 initStore();
 </script>
